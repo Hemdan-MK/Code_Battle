@@ -1,6 +1,6 @@
 // src/components/_layouts/Footer.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
     Github,
     Twitter,
@@ -19,6 +19,12 @@ import {
 const Footer: React.FC = () => {
     const [email, setEmail] = useState('');
     const [isSubscribed, setIsSubscribed] = useState(false);
+    const location = useLocation();
+
+    // Only show footer on home route
+    if (!(location.pathname === '/')) {
+        return null;
+    }
 
     const handleSubscribe = (e: React.FormEvent) => {
         e.preventDefault();

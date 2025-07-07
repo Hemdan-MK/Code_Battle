@@ -1,7 +1,7 @@
 // controllers/userController.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../../services/admin/usersServices';
+import { UserService } from '../../services/admin/userAdminService';
 import {
     GetUsers,
     CreateUser,

@@ -1,9 +1,10 @@
 // routes/admin/user.routes.ts
 
 import { Router } from "express";
-import { UsersController } from "../../controllers/admin/usersController";
-import { UserService } from "../../services/admin/usersServices";
+import { UsersController } from "../../controllers/admin/usersAdminController";
+import { UserService } from "../../services/admin/userAdminService";
 import { UserRepository } from "../../repositories/UserRepository";
+
 
 const router = Router();
 const userRepository = new UserRepository()
@@ -17,5 +18,7 @@ router.post("/create", usersController.createUser.bind(usersController));
 router.get("/edit/:id", usersController.editRequest.bind(usersController));
 router.put("/update/:id", usersController.updateUser.bind(usersController));
 router.patch("/user-ban/:id", usersController.banStatus.bind(usersController));
-router.get("/users/stats", usersController.getUserStats.bind(usersController))
+router.get("/users/stats", usersController.getUserStats.bind(usersController));
+
+
 export default router;

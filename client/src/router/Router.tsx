@@ -21,6 +21,7 @@ import GitHubCallback from "@/components/_auth/GithubCallback";
 import GoogleCallback from "@/components/_auth/GoogleCallback";
 import PublicRoute from "./PublicRoutes";
 import BannedPage from "@/pages/BannedPage";
+import ProfilePage from "@/pages/user/ProfilePage";
 
 const AppRouter: React.FC = () => {
     return (
@@ -29,11 +30,12 @@ const AppRouter: React.FC = () => {
 
                 <Route path="/" element={<UserLayout />}>
                     <Route index element={<LandingPage />} />
+                    <Route element={<ProtectedRoute role="user" />}>
+                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                    </Route>
                 </Route>
 
-                <Route element={<ProtectedRoute role="user" />}>
-                    <Route path="/home" element={<HomePage />} />
-                </Route>
 
                 <Route element={<PublicRoute />}>
                     <Route path="/login" element={<LoginPage />} />

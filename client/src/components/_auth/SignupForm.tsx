@@ -68,7 +68,6 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSuccess, setIsSuccess] = useState(false);
-    const [showErrorToast, setShowErrorToast] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
     const dispatch = useDispatch<AppDispatch>();
@@ -103,19 +102,6 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
         }
     };
 
-    const showErrorToastMessage = (message: string) => {
-        setErrorMessage(message);
-        setShowErrorToast(true);
-        // Auto hide toast after 4 seconds
-        setTimeout(() => {
-            setShowErrorToast(false);
-        }, 4000);
-    };
-
-    const hideErrorToast = () => {
-        setShowErrorToast(false);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -124,7 +110,6 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
         setIsSuccess(false);
 
         try {
-            console.log('Form data being sent:', formData);
 
             const result = await dispatch(
                 signupThunk({
@@ -151,11 +136,7 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
             }
         } catch (error: any) {
             console.error('SignUp error:', error);
-            
-            // Show error in toast
-            const errorMsg = error?.message || 'Registration failed. Please try again.';
-            showErrorToastMessage(errorMsg);
-            
+                     
             // Clear any general errors from form
             setErrors(prev => ({ ...prev, general: '' }));
         }
@@ -171,29 +152,6 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
 
     return (
         <div className="w-full max-w-md mx-auto">
-            {/* Error Toast */}
-            <div
-                className={`
-                    fixed top-4 right-4 bg-gradient-to-r from-red-600 to-red-500 text-white px-4 py-3 rounded-lg shadow-lg 
-                    flex items-center gap-3 z-50 transition-all duration-500 ease-out transform
-                    ${showErrorToast
-                        ? 'translate-x-0 opacity-100 scale-100'
-                        : 'translate-x-full opacity-0 scale-95 pointer-events-none'
-                    }
-                `}
-            >
-                <AlertCircle className="w-5 h-5 text-red-100" />
-                <div className="flex-1">
-                    <p className="font-semibold text-sm">Registration Failed</p>
-                    <p className="text-xs text-red-100">{errorMessage}</p>
-                </div>
-                <button
-                    onClick={hideErrorToast}
-                    className="text-red-100 hover:text-white transition-colors ml-2"
-                >
-                    <X className="w-4 h-4" />
-                </button>
-            </div>
 
             {/* Form Header */}
             <div className="text-center mb-6">

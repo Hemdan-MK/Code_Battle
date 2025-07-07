@@ -5,7 +5,7 @@ import { number } from "zod";
 const userSchema = new Schema<IUser>({
     token: { type: String, required: false },
     username: { type: String, required: true },
-    refreshToken: { type: String, required: false },
+    refreshToken: { type: String,},
     email: { type: String, required: true, unique: true },
     phone: { type: Number, required: true, },
     password: { type: String, required: true },

@@ -173,7 +173,17 @@ const LoginForm = () => {
             if (result.isAdmin) {
               navigate('/admin/dashboard', { replace: true });
             } else {
-              navigate('/home', { replace: true });
+              setTimeout(() => {
+                navigate('/signup-success', {
+                  state: {
+                    username : result.user.name,
+                    email: result.user.email,
+                    message: 'Account verified successfully!',
+                    isSignupComplete: true
+                  },
+                  replace: true
+                });
+              }, 1500);
             }
           })
           .catch((err) => console.error('Login error:', err));

@@ -17,9 +17,11 @@ import {
     RefreshTokenPayload,
     TempTokenPayload,
     forgotPassword,
+    SignupResponse,
+    AuthResponse
 } from '../types/index';
+
 import { IUser } from '../models/interfaces/Index';
-import { AuthResponse, SignupResponse } from '../types';
 import axios from 'axios';
 
 
@@ -71,7 +73,6 @@ export class AuthService {
             success: true,
             message: 'Login successful',
             token,
-            refreshToken,
             user: {
                 id: user._id,
                 name: user.name,
@@ -112,14 +113,16 @@ export class AuthService {
         });
 
         // Generate and send OTP
-        const session = "signup"
-        await this.generateAndSendOTP(user._id, 'email', session);
-        await this.generateAndSendOTP(user._id, 'phone', session);
+        const session = "signUp"
+        await this.generateAndSendOTP(user._id, session);
+        await this.generateAndSendOTP(user._id, session);
 
         // Generate temp token
         const tempToken = this.generateTempToken(user._id);
 
         return {
+            success: true,
+            message: "Signup initialize successfully",
             tempToken,
             user: {
                 id: user._id,
@@ -131,12 +134,8 @@ export class AuthService {
         };
     }
 
-    async verifyOTP(data: OTPVerificationRequest, tempToken: string): Promise<AuthResponse> {
-        const { otp, method } = data;
-
-        console.log(data);
-        console.log(tempToken);
-        console.log(process.env.JWT_TEMP_SECRET!);
+    async verifyOTP(data: OTPVerificationRequest): Promise<AuthResponse> {
+        const { otp, tempToken } = data;
 
         // Verify temp token
         const decoded = jwt.verify(tempToken, process.env.JWT_TEMP_SECRET!) as TempTokenPayload;
@@ -144,7 +143,7 @@ export class AuthService {
         console.log(userId);
 
         // Find OTP
-        const otpRecord = await this.otpRepository.findByUserIdAndType(userId.toString(), method);
+        const otpRecord = await this.otpRepository.findByUserIdAndType(userId.toString());
         console.log(otpRecord);
 
         if (!otpRecord) {
@@ -164,16 +163,13 @@ export class AuthService {
 
         // Update verification status
         const updates: Partial<IUser> = {};
-        if (method === 'email') {
-            updates.isEmailVerified = true;
-        } else {
-            updates.isPhoneVerified = true;
-        }
+        updates.isEmailVerified = true;
+
 
         await this.userRepository.update(userId.toString(), updates);
 
         // Delete OTP
-        await this.otpRepository.deleteByUserIdAndType(userId.toString(), method);
+        await this.otpRepository.deleteByUserIdAndType(userId.toString());
 
         // Generate tokens
         const token = this.generateAccessToken(userId.toString());
@@ -183,7 +179,6 @@ export class AuthService {
             success: true,
             message: 'OTP verified successfully',
             token,
-            refreshToken,
             user: {
                 id: user._id,
                 name: user.name,
@@ -194,23 +189,25 @@ export class AuthService {
         };
     }
 
-    async resendOTP(data: ResendOTPRequest, tempToken: string): Promise<{ success: boolean }> {
-        const { email, where } = data;
+    async resendOTP(data: ResendOTPRequest): Promise<{ success: boolean, message: string }> {
+        const { tempToken, where } = data;
 
-        const method = "email";
 
         // Verify temp token
         const decoded = jwt.verify(tempToken, process.env.JWT_TEMP_SECRET!) as TempTokenPayload;
         const userId = decoded.userId;
 
         // Generate and send new OTP
-        await this.generateAndSendOTP(userId.toString(), method, where);
+        await this.generateAndSendOTP(userId.toString(), where);
 
-        return { success: true };
+        return {
+            success: true,
+            message: "Resend OTP Success"
+        };
     }
 
     async googleAuth({ access_token, id_token }: GoogleAuthRequest): Promise<{
-        success: boolean; message: string; token: string; refreshToken: string; user: any; isAdmin: boolean;
+        success: boolean; message: string; token: string; user: any; isAdmin: boolean;
     }> {
 
         const { data: googleUser } = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -265,7 +262,6 @@ export class AuthService {
             success: true,
             message: 'Google authentication successful',
             token,
-            refreshToken,
             user: {
                 id: user._id,
                 name: user.name,
@@ -278,7 +274,7 @@ export class AuthService {
         };
     }
 
-    async githubAuth(data: GitHubAuthRequest): Promise<{ success: boolean; message: string; token: string; refreshToken: string; user: any; isAdmin?: boolean }> {
+    async githubAuth(data: GitHubAuthRequest): Promise<{ success: boolean; message: string; token: string; user: any; isAdmin?: boolean }> {
         const { code } = data;
 
         // Exchange code for access token and get user info
@@ -344,7 +340,6 @@ export class AuthService {
             success: true,
             message: 'GitHub authentication successful',
             token,
-            refreshToken,
             user: {
                 id: user._id,
                 name: user.name,
@@ -356,9 +351,9 @@ export class AuthService {
         };
     }
 
-    private async generateAndSendOTP(userId: string, type: 'email' | 'phone', session: 'forgotpassword' | 'signup'): Promise<void> {
+    private async generateAndSendOTP(userId: string, session: 'forgot' | 'signUp'): Promise<void> {
         // Delete existing OTP
-        await this.otpRepository.deleteByUserIdAndType(userId, type);
+        await this.otpRepository.deleteByUserIdAndType(userId);
 
         // Generate new OTP
         const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -367,7 +362,6 @@ export class AuthService {
         await this.otpRepository.create({
             userId,
             otp,
-            type,
             expiresAt: new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
         });
 
@@ -378,11 +372,8 @@ export class AuthService {
         }
 
         // Send OTP
-        if (type === 'email') {
-            await this.emailService.sendOTP(user.email, otp, session);
-        } else {
-            await this.smsService.sendOTP(user.phone, otp);
-        }
+        await this.emailService.sendOTP(user.email, otp, session);
+
     }
 
     private generateAccessToken(userId: string): string {
@@ -446,8 +437,8 @@ export class AuthService {
         if (!user) {
             throw new Error('User not found');
         }
-        const session = 'forgotpassword'
-        await this.generateAndSendOTP(user._id, 'email', session);
+        const session = 'forgot'
+        await this.generateAndSendOTP(user._id, session);
 
         const tempToken = this.generateTempToken(user._id);
 
@@ -471,7 +462,7 @@ export class AuthService {
         const userId = decoded.userId;
 
         // Find OTP
-        const otpRecord = await this.otpRepository.findByUserIdAndType(userId.toString(), "email");
+        const otpRecord = await this.otpRepository.findByUserIdAndType(userId.toString());
         if (!otpRecord) {
             throw new Error('OTP not found or expired');
         }
@@ -486,7 +477,7 @@ export class AuthService {
         }
 
         // Delete OTP
-        await this.otpRepository.deleteByUserIdAndType(userId.toString(), "email");
+        await this.otpRepository.deleteByUserIdAndType(userId.toString());
 
         return {
             success: true,

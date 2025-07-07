@@ -10,14 +10,9 @@ const otpSchema = new Schema<IOTP>({
         type: String,
         required: true
     },
-    type: {
-        type: String,
-        enum: ['email', 'phone'],
-        required: true
-    },
     session: {
         type: String,
-        enum: ['forgotpassword' , 'signup']
+        enum: ['forgot' , 'signUp']
     },
     expiresAt: {
         type: Date,

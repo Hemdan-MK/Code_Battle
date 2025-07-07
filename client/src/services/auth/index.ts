@@ -1,13 +1,13 @@
 // services/auth/index.ts
 
-import { getTempToken, removeTempToken, removeTempUser, setTempToken } from "@/utils/tokenUtils";
+import { getTempToken, removeTempToken, setTempToken } from "@/utils/tokenUtils";
+
 import api from "../axios/axios";
 
 export interface AuthResponse {
     success: boolean;
     message: string;
     token: string;
-    refreshToken: string;
     user: {
         id: string;
         name: string;
@@ -31,6 +31,8 @@ interface SignupRequest {
 }
 
 interface SignupResponse {
+    success: boolean;
+    message: string;
     tempToken: string;
     user: {
         id: string;
@@ -44,13 +46,12 @@ interface SignupResponse {
 interface OTPVerificationRequest {
     otp: string;
     tempToken: string;
-    method: "email" | "phone";
 }
 
 interface OTPVerificationResponse {
     success: boolean;
+    message: string;
     token: string;
-    refreshToken: string;
     user: {
         id: string;
         name: string;
@@ -61,12 +62,7 @@ interface OTPVerificationResponse {
 }
 
 interface ResendOTPRequest {
-    method: "email" | "phone";
     tempToken: string;
-}
-
-interface ResendOTPResponse {
-    success: boolean;
 }
 
 interface GoogleAuthRequest {
@@ -77,7 +73,6 @@ interface GoogleAuthResponse {
     success: boolean;
     message: string;
     token: string;
-    refreshToken: string;
     user: {
         id: string;
         name: string;
@@ -96,7 +91,6 @@ interface GitHubAuthResponse {
     success: boolean;
     message: string;
     token: string;
-    refreshToken: string;
     user: {
         id: string;
         name: string;
@@ -126,25 +120,15 @@ interface VerifyResetCodeRequest {
 
 interface VerifyResetCodeResponse {
     success: boolean;
+    message: string;
     isCorrect: boolean;
-    message: string;
 }
 
 
-interface ResetPasswordResponse {
+
+interface APIResponse {
     success: boolean;
     message: string;
-}
-
-interface ResendResetCodeRequest {
-    email: string;
-    tempToken?: string;
-}
-
-interface ResendResetCodeResponse {
-    success: boolean;
-    message: string;
-    resetToken?: string;
 }
 
 // Test server connection
@@ -189,12 +173,9 @@ export const signupAPI = async (
             throw new Error(
                 "Cannot connect to server. Please ensure the server is running on http://localhost:3000"
             );
-        } else {
-            console.log("conn signup");
         }
 
-        removeTempUser()
-        const response = await api.post<SignupResponse>("/auth/signup", data);
+        const response = await api.post("/auth/signup", data);
         console.log("Signup response :", response.data);
 
         return response.data;
@@ -211,15 +192,7 @@ export const verifyOTPAPI = async (
     try {
         const response = await api.post<AuthResponse>(
             "/auth/otp-sign",
-            {
-                otp: data.otp,
-                method: data.method,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${data.tempToken}`,
-                },
-            }
+            data
         );
 
         console.log("OTP verification response status:", response.status);
@@ -234,17 +207,13 @@ export const verifyOTPAPI = async (
 // Resend OTP API
 export const resendOTPAPI = async (
     data: ResendOTPRequest
-): Promise<ResendOTPResponse> => {
+): Promise<APIResponse> => {
     try {
-        const response = await api.post<{ success: boolean; message: string }>(
+        const response = await api.post<APIResponse>(
             "/auth/resend-otp",
             {
-                method: data.method,
-            },
-            {
-                headers: {
-                    Authorization: `Bearer ${data.tempToken}`,
-                },
+                tempToken: data.tempToken,
+                where: "signUp"
             }
         );
 
@@ -353,11 +322,11 @@ export const verifyResetCodeAPI = async (data: VerifyResetCodeRequest): Promise<
 
 export const resetPasswordAPI = async (
     data: string
-): Promise<ResetPasswordResponse> => {
+): Promise<APIResponse> => {
     try {
         const tempToken = getTempToken()
 
-        const response = await api.post<ResetPasswordResponse>(
+        const response = await api.post<APIResponse>(
             "/auth/reset-new-password",
             {
                 password: data,
@@ -374,21 +343,16 @@ export const resetPasswordAPI = async (
     }
 };
 
-export const resendResetCodeAPI = async (
-    data: ResendResetCodeRequest
-): Promise<ResendResetCodeResponse> => {
+export const resendResetCodeAPI = async (): Promise<APIResponse> => {
     try {
 
         const tempToken = getTempToken()
 
-        const response = await api.post<ResendResetCodeResponse>(
+        const response = await api.post<APIResponse>(
             "/auth/resend-reset-code",
             {
-                data: {
-                    email: data,
-                    where: 'forgotpassword'
-                },
-                tempToken
+                tempToken,
+                where: "forgot"
             }
 
         );

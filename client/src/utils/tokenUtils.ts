@@ -63,18 +63,11 @@ export const removeTempUser = (): void => {
     localStorage.removeItem('tempUser');
 };
 
-export const setRefreshToken = (refreshToken: AuthResponse['refreshToken']): void => {
-    localStorage.setItem('refreshToken', JSON.stringify(refreshToken));
-};
 
-export const removeRefreshToken = (): void => {
-    localStorage.removeItem('refreshToken');
-};
 
 export const logout = (): void => {
     removeToken();
     removeUser();
     removeTempToken();
     removeTempUser();
-    removeRefreshToken();
 };

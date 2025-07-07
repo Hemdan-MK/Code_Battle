@@ -40,15 +40,16 @@ export class AuthController {
 
   verifyOTP = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      console.log(req.body);
+      
       const validatedData = otpVerificationSchema.parse(req.body);
-      const tempToken = req.headers.authorization?.replace('Bearer ', '');
 
-      if (!tempToken) {
+      if (!validatedData.tempToken) {
         res.status(401).json({ success: false, message: 'Temp token required' });
         return;
       }
 
-      const result = await this.authService.verifyOTP(validatedData, tempToken);
+      const result = await this.authService.verifyOTP(validatedData);
 
       res.json(result);
     } catch (error) {
@@ -133,15 +134,18 @@ export class AuthController {
 
   resendOTP = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const validatedData = resendOTPSchema.parse(req.body.data);
-      // const tempToken = req.headers.authorization?.replace('Bearer ', '');
-      const tempToken = req.body.tempToken;
+      console.log(req.body);
+      
+      const validatedData = resendOTPSchema.parse(req.body);
+
+      const tempToken = validatedData.tempToken;
 
       if (!tempToken) {
         res.status(401).json({ success: false, message: 'Temp token required' });
         return;
       }
-      const result = await this.authService.resendOTP(validatedData, tempToken);
+
+      const result = await this.authService.resendOTP(validatedData);
       res.json(result);
     } catch (error) {
       next(error);

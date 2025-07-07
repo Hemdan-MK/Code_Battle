@@ -19,7 +19,7 @@ import {
 const SignUpSuccessPage: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(30);
   const navigate = useNavigate();
   const location = useLocation();
   

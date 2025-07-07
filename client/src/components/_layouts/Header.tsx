@@ -1,12 +1,24 @@
 // src/components/_layouts/Header.tsx
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Sword, Users, Trophy, Menu, X, Zap, User } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Sword, Users, Menu, X, Zap, User, LogOut } from "lucide-react";
+import { getToken } from "@/utils/tokenUtils";
 
 const Header: React.FC = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Check if current route is home
+    const isLandingPage = location.pathname === "/";
+    const isProfilePage = location.pathname === '/profile'
+    console.log("isLandingPage ", isLandingPage);
+    console.log("isProfilePage ", isProfilePage);
+
 
     useEffect(() => {
         setIsVisible(true);
@@ -15,12 +27,43 @@ const Header: React.FC = () => {
             setIsScrolled(window.scrollY > 20);
         };
 
+        // Check for user token in localStorage
+        const checkAuth = async () => {
+            const token = await getToken()
+            setIsAuthenticated(!!token);
+        };
+
+        // Check auth on component mount
+        checkAuth();
+
+        // Listen for storage changes (in case user logs in/out in another tab)
+        window.addEventListener('storage', checkAuth);
         window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
+
+        return () => {
+            window.removeEventListener('storage', checkAuth);
+            window.removeEventListener("scroll", handleScroll);
+        };
     }, []);
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
+    const handleLogout = () => {
+        // Remove token from localStorage
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('token');
+        localStorage.removeItem('authToken');
+
+        // Update auth state
+        setIsAuthenticated(false);
+
+        // Close mobile menu if open
+        setIsMobileMenuOpen(false);
+
+        // Navigate to home page
+        navigate('/');
     };
 
     return (
@@ -80,21 +123,45 @@ const Header: React.FC = () => {
 
                         {/* Action Buttons */}
                         <div className="hidden md:flex items-center gap-3">
-                            <Link
-                                to="/profile"
-                                className="group flex items-center gap-2 px-4 py-2 rounded-full text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
-                            >
-                                <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                                <span className="font-medium">Profile</span>
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    {isProfilePage ? (
+                                        <Link
+                                            to="/home"
+                                            className="group flex items-center gap-2 px-4 py-2 rounded-full text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
+                                        >
+                                            <X className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                            <span className="font-medium">Home</span>
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            to="/profile"
+                                            className="group flex items-center gap-2 px-4 py-2 rounded-full text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
+                                        >
+                                            <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                            <span className="font-medium">Profile</span>
+                                        </Link>
+                                    )}
+                                </>
+                            ) : (
+                                <Link
+                                    to="/login"
+                                    className="group flex items-center gap-2 px-4 py-2 rounded-full text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
+                                >
+                                    <User className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                                    <span className="font-medium">Login</span>
+                                </Link>
+                            )}
 
-                            <Link
-                                to="/play"
-                                className="group flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-500 rounded-full text-white font-bold hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300"
-                            >
-                                <Zap className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                                <span>Play Now</span>
-                            </Link>
+                            {isLandingPage && (
+                                <Link
+                                    to="/play"
+                                    className="group flex items-center gap-2 px-6 py-2 bg-gradient-to-r from-purple-600 to-purple-500 rounded-full text-white font-bold hover:scale-105 hover:shadow-lg hover:shadow-purple-500/30 transition-all duration-300"
+                                >
+                                    <Zap className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                                    <span>Play Now</span>
+                                </Link>
+                            )}
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -144,30 +211,56 @@ const Header: React.FC = () => {
 
                             <hr className="border-purple-800 my-3" />
 
-                            <Link
-                                to="/profile"
-                                className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                <User className="w-5 h-5" />
-                                <span className="font-medium">Profile</span>
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <Link
+                                        to="/profile"
+                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        <User className="w-5 h-5" />
+                                        <span className="font-medium">Profile</span>
+                                    </Link>
 
-                            <Link
-                                to="/play"
-                                className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-500 rounded-xl text-white font-bold hover:scale-[1.02] transition-all duration-300"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                            >
-                                <Zap className="w-5 h-5" />
-                                <span>Play Now</span>
-                            </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-red-900/50 transition-all duration-300"
+                                    >
+                                        <LogOut className="w-5 h-5" />
+                                        <span className="font-medium">Logout</span>
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        to="/login"
+                                        className="flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800/50 transition-all duration-300"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        <User className="w-5 h-5" />
+                                        <span className="font-medium">Login</span>
+                                    </Link>
+
+                                    {/* Show Play Now button only on home page */}
+                                    {isLandingPage && (
+                                        <Link
+                                            to="/play"
+                                            className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-purple-600 to-purple-500 rounded-xl text-white font-bold hover:scale-[1.02] transition-all duration-300"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        >
+                                            <Zap className="w-5 h-5" />
+                                            <span>Play Now</span>
+                                        </Link>
+                                    )}
+                                </>
+                            )}
                         </div>
                     </div>
-                </nav>
-            </div>
+                </nav >
+            </div >
 
             {/* Background Glow Effect */}
-            <div
+            < div
                 className={`
                     pointer-events-none 
                     absolute top-0 left-1/2 -translate-x-1/2 w-96 h-32 
@@ -176,7 +269,7 @@ const Header: React.FC = () => {
                     ${isScrolled ? "opacity-100" : "opacity-0"}
                 `}
             />
-        </header>
+        </header >
     );
 };
 

@@ -20,17 +20,17 @@ export const signupSchema = z.object({
 
 export const otpVerificationSchema = z.object({
     otp: z.string().length(6, 'OTP must be 6 digits'),
-    method: z.enum(['email', 'phone'])
+    tempToken: z.string().min(1, "Token is required"),
 });
 
 export const resendOTPSchema = z.object({
-    // method: z.enum(['email', 'phone'])
-    email: z.string().email('Invalid email format'),
-    where: z.enum(['forgotpassword', 'signup'])
+    where: z.enum(['signUp', 'forgot']),
+    tempToken: z.string().min(1, "Token is required"),
 });
 
+
 export const googleAuthSchema = z.object({
-  credential: z.string().min(1, 'Google Credential (code) is required'),
+    credential: z.string().min(1, 'Google Credential (code) is required'),
 });
 
 export const githubAuthSchema = z.object({

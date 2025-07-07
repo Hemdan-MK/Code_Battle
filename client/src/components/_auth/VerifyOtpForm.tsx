@@ -132,7 +132,7 @@ const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email }) => {
     } catch (error) {
       console.error('OTP verification failed:', error);
       setError('Verification failed. Please try again.');
-      
+
       // Clear OTP inputs on error
       setOtp(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
@@ -149,20 +149,20 @@ const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email }) => {
     setResendSuccess(false);
 
     try {
-      const result = await resendResetCodeAPI({ email });
-      
+      const result = await resendResetCodeAPI();
+
       if (result.success) {
         // Clear current OTP
         setOtp(['', '', '', '', '', '']);
         inputRefs.current[0]?.focus();
-        
+
         // Reset timer
         setTimeLeft(60);
         setCanResend(false);
-        
+
         // Show success message
         setResendSuccess(true);
-        
+
         // Hide success message after 3 seconds
         setTimeout(() => {
           setResendSuccess(false);
@@ -236,7 +236,7 @@ const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email }) => {
               />
             ))}
           </div>
-          
+
           {/* Error Message */}
           {error && (
             <div className="flex items-center justify-center gap-2 text-red-400 text-xs md:text-sm">
@@ -244,7 +244,7 @@ const VerifyOtpForm: React.FC<VerifyOtpFormProps> = ({ email }) => {
               {error}
             </div>
           )}
-          
+
           {/* Success Message */}
           {resendSuccess && (
             <div className="flex items-center justify-center gap-2 text-green-400 text-xs md:text-sm">

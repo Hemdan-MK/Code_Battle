@@ -14,7 +14,7 @@ export interface IUserRepository {
 
 export interface IOTPRepository {
     create(otpData: Partial<IOTP>): Promise<IOTP>;
-    findByUserIdAndType(userId: string, type: 'email' | 'phone'): Promise<IOTP | null>;
-    deleteByUserIdAndType(userId: string, type: 'email' | 'phone'): Promise<boolean>;
+    findByUserIdAndType(userId: string): Promise<IOTP | null>;
+    deleteByUserIdAndType(userId: string,): Promise<boolean>;
     deleteExpired(): Promise<number>;
 }

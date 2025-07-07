@@ -19,7 +19,7 @@ export class EmailService {
         });
     }
 
-    async sendOTP(email: string, otp: string, session: "forgotpassword" | "signup"): Promise<void> {
+    async sendOTP(email: string, otp: string, session: "forgot" | "signUp"): Promise<void> {
 
         const mailOptions = {
             from: process.env.EMAIL_USER,

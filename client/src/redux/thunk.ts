@@ -18,13 +18,10 @@ import {
     setToken,
     setTempToken,
     setUser,
-    removeUser,
     logout,
-    setRefreshToken,
-    removeRefreshToken,
     setAdmin,
+    getTempToken,
 } from "@/utils/tokenUtils";
-import { isDataView } from "util/types";
 
 interface LoginData {
     email: string;
@@ -46,11 +43,6 @@ export const loginThunk = createAsyncThunk(
                 setToken(response.token);
             }
 
-            // Store refresh token if available
-            if (response.refreshToken) {
-                setRefreshToken(response.refreshToken)
-            }
-
             if (response.isAdmin) {
                 await setAdmin(response.user);
             } else {
@@ -63,18 +55,24 @@ export const loginThunk = createAsyncThunk(
 
             // Remove any existing tokens on login failure
             removeToken();
-            removeRefreshToken()
 
             let errorMessage = "Login failed. Please try again.";
 
             // Handle different types of errors
-            if (error?.response?.data?.message) {
+            // if (error?.response?.data?.message) {
+            //     errorMessage = error.response.data.message;
+            // } else if (error?.message) {
+            //     errorMessage = error.message;
+            // } else if (typeof error === 'string') {
+            //     errorMessage = error;
+            // }
+
+            if (error.response && error.response.data && error.response.data.message) {
                 errorMessage = error.response.data.message;
-            } else if (error?.message) {
+            } else if (error.message) {
                 errorMessage = error.message;
-            } else if (typeof error === 'string') {
-                errorMessage = error;
             }
+
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -94,8 +92,10 @@ export const signupThunk = createAsyncThunk(
         thunkAPI
     ) => {
         try {
+
+            removeTempUser()
+
             const response = await signupAPI(data);
-            console.log(response);
 
             setTempUser(response.user);
             setTempToken(response.tempToken);
@@ -104,12 +104,14 @@ export const signupThunk = createAsyncThunk(
                 ...response,
                 requiresOTP: true,
             };
-        } catch (error) {
+        } catch (error: any) {
             removeToken();
 
             let errorMessage = "Signup failed. Please try again.";
 
-            if (error instanceof Error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
                 errorMessage = error.message;
             }
 
@@ -121,15 +123,19 @@ export const signupThunk = createAsyncThunk(
 // resend OTP thunk
 export const resendOTPThunk = createAsyncThunk(
     "auth/resendOTP",
-    async (data: { method: "email" | "phone"; tempToken: string }, thunkAPI) => {
+    async (_, thunkAPI) => {
         try {
-            const response = await resendOTPAPI(data);
+            const tempToken = await getTempToken()
+            const response = await resendOTPAPI({ tempToken });
             return response;
         } catch (error) {
             let errorMessage = "Failed to resend OTP. Please try again.";
-            if (error instanceof Error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
                 errorMessage = error.message;
             }
+
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -140,26 +146,33 @@ export const resendOTPThunk = createAsyncThunk(
 export const verifyOTPThunk = createAsyncThunk(
     "auth/verifyOTP",
     async (
-        data: { otp: string; tempToken: string; method: "email" | "phone" },
+        data: { otp: string },
         thunkAPI
     ) => {
         try {
-            const response = await verifyOTPAPI(data);
+            const tempToken = await getTempToken()
+
+            const response = await verifyOTPAPI({
+                otp: data.otp,
+                tempToken
+            });
 
             removeTempToken();
             removeTempUser();
-            
+
             setToken(response.token);
             setUser(response.user);
-            setRefreshToken(response.refreshToken);
 
             return response;
         } catch (error) {
             let errorMessage = "OTP verification failed. Please try again.";
 
-            if (error instanceof Error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
                 errorMessage = error.message;
             }
+
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -173,7 +186,6 @@ export const googleAuthThunk = createAsyncThunk(
             const response = await googleAuthAPI(data);
 
             await setToken(response.token);
-            await setRefreshToken(response.refreshToken)
 
             if (response.isAdmin) {
                 await setAdmin(response.user);
@@ -187,9 +199,12 @@ export const googleAuthThunk = createAsyncThunk(
 
             let errorMessage = "Google authentication failed. Please try again.";
 
-            if (error instanceof Error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
                 errorMessage = error.message;
             }
+
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -203,7 +218,6 @@ export const githubAuthThunk = createAsyncThunk(
             const response = await githubAuthAPI(data);
 
             await setToken(response.token);
-            await setRefreshToken(response.refreshToken)
 
             if (response.isAdmin) {
                 await setAdmin(response.user);
@@ -217,9 +231,12 @@ export const githubAuthThunk = createAsyncThunk(
 
             let errorMessage = "GitHub authentication failed. Please try again.";
 
-            if (error instanceof Error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
                 errorMessage = error.message;
             }
+
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -239,9 +256,12 @@ export const logoutThunk = createAsyncThunk(
 
             let errorMessage = "Logout failed";
 
-            if (error instanceof Error) {
+            if (error.response && error.response.data && error.response.data.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
                 errorMessage = error.message;
             }
+
 
             return thunkAPI.rejectWithValue(errorMessage);
         }

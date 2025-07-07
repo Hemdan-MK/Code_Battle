@@ -8,12 +8,12 @@ export class OTPRepository implements IOTPRepository {
         return await otp.save();
     }
 
-    async findByUserIdAndType(userId: string, type: 'email' | 'phone'): Promise<IOTP | null> {
-        return await OTP.findOne({ userId, type });
+    async findByUserIdAndType(userId: string): Promise<IOTP | null> {
+        return await OTP.findOne({ userId });
     }
 
-    async deleteByUserIdAndType(userId: string, type: 'email' | 'phone'): Promise<boolean> {
-        const result = await OTP.deleteOne({ userId, type });
+    async deleteByUserIdAndType(userId: string): Promise<boolean> {
+        const result = await OTP.deleteOne({ userId });
         return result.deletedCount > 0;
     }
 

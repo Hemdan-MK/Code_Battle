@@ -5,7 +5,7 @@ export interface IUser extends Document {
     token: string;
     username: string;
     name: string;
-    refreshToken: string;
+    refreshToken?: string;
     email: string;
     password: string;
     phone: number | null;
@@ -40,8 +40,7 @@ export interface IUser extends Document {
 export interface IOTP extends Document {
     userId: string;
     otp: string;
-    type: 'email' | 'phone';
     expiresAt: Date;
     createdAt: Date;
-    session: "forgotpassword" | "signup";
+    session: "forgot" | "signUp";
 }

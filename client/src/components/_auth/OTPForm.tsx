@@ -7,7 +7,6 @@ import { verifyOTPThunk, resendOTPThunk } from '../../redux/thunk';
 import { clearError } from '../../redux/slice';
 import {
     Mail,
-    Phone,
     ChevronRight,
     AlertCircle,
     CheckCircle,
@@ -16,17 +15,14 @@ import {
     ArrowLeft,
     Swords
 } from 'lucide-react';
-import { getTempToken } from '@/utils/tokenUtils';
 
 interface LocationState {
     email?: string;
-    phoneNumber?: string;
     username?: string;
 }
 
 const VerifyOTPPage: React.FC = () => {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const [activeMethod, setActiveMethod] = useState<'email' | 'phone'>('email');
     const [timeLeft, setTimeLeft] = useState(60);
     const [canResend, setCanResend] = useState(false);
     const [isVerified, setIsVerified] = useState(false);
@@ -42,26 +38,16 @@ const VerifyOTPPage: React.FC = () => {
     // Get data from navigation state
     const locationState = location.state as LocationState;
     const userEmail = locationState?.email || '';
-    const userPhone = locationState?.phoneNumber || '';
     const username = locationState?.username || '';
-    
-    const tempToken = getTempToken()
+
 
     useEffect(() => {
-        if (!userEmail && !userPhone) {
+        if (!userEmail) {
             navigate('/signup', { replace: true });
             return;
         }
 
-        if (!tempToken) {
-            console.error('No temp token available');
-            navigate('/signup', {
-                replace: true,
-                state: { error: 'Session expired. Please sign up again.' }
-            });
-            return;
-        }
-    }, [userEmail, userPhone, navigate]);
+    }, [userEmail, navigate]);
 
     // Timer for resend functionality
     useEffect(() => {
@@ -137,10 +123,6 @@ const VerifyOTPPage: React.FC = () => {
             return;
         }
 
-        if (!tempToken) {
-            setErrorMessage('Session expired. Please try again.');
-            return;
-        }
 
         try {
             setErrorMessage('');
@@ -148,8 +130,6 @@ const VerifyOTPPage: React.FC = () => {
 
             const result = await dispatch(verifyOTPThunk({
                 otp: otpString,
-                tempToken: tempToken,
-                method: activeMethod
             })).unwrap();
 
             if (result.success) {
@@ -181,16 +161,13 @@ const VerifyOTPPage: React.FC = () => {
     };
 
     const handleResend = async () => {
-        if (!canResend || loading || !tempToken) return;
+        if (!canResend || loading) return;
 
         try {
             setErrorMessage('');
             dispatch(clearError());
 
-            await dispatch(resendOTPThunk({
-                method: activeMethod,
-                tempToken: tempToken
-            })).unwrap();
+            await dispatch(resendOTPThunk()).unwrap();
 
             // Reset timer
             setTimeLeft(60);
@@ -220,11 +197,6 @@ const VerifyOTPPage: React.FC = () => {
         return `${maskedName}@${domain}`;
     };
 
-    const maskPhone = (phone: string) => {
-        if (!phone) return '';
-        return phone.replace(/(\d{3})\d{4}(\d{3})/, '$1****$2');
-    };
-
     const otpComplete = otp.join('').length === 6;
 
     // Use local error state or Redux error
@@ -242,63 +214,18 @@ const VerifyOTPPage: React.FC = () => {
                         </div>
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-white bg-clip-text text-transparent mb-2">
-                        Verify Your Identity
+                        Verify Your Email
                     </h2>
                     <p className="text-gray-400 text-sm md:text-base mb-4">
-                        Enter the 6-digit code we sent to secure your account
+                        Enter the 6-digit code we sent to your email address
                     </p>
                 </div>
 
-                {/* Method Selection */}
-                <div className="flex gap-2 mb-6 p-1 bg-gray-900/50 rounded-lg border border-purple-800/30">
-                    <button
-                        type="button"
-                        onClick={() => setActiveMethod('email')}
-                        disabled={loading || isVerified}
-                        className={`
-                            flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all duration-300
-                            ${activeMethod === 'email'
-                                ? 'bg-purple-600 text-white shadow-lg'
-                                : 'text-gray-400 hover:text-gray-200'
-                            }
-                            ${(loading || isVerified) ? 'opacity-50 cursor-not-allowed' : ''}
-                        `}
-                    >
-                        <Mail className="w-4 h-4" />
-                        Email
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setActiveMethod('phone')}
-                        disabled={loading || isVerified}
-                        className={`
-                            flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-md text-sm font-medium transition-all duration-300
-                            ${activeMethod === 'phone'
-                                ? 'bg-purple-600 text-white shadow-lg'
-                                : 'text-gray-400 hover:text-gray-200'
-                            }
-                            ${(loading || isVerified) ? 'opacity-50 cursor-not-allowed' : ''}
-                        `}
-                    >
-                        <Phone className="w-4 h-4" />
-                        SMS
-                    </button>
-                </div>
-
-                {/* Contact Info Display */}
+                {/* Email Display */}
                 <div className="mb-6 p-3 bg-purple-900/20 border border-purple-800/30 rounded-lg">
                     <div className="flex items-center gap-2 text-gray-300 text-sm">
-                        {activeMethod === 'email' ? (
-                            <>
-                                <Mail className="w-4 h-4 text-purple-400" />
-                                <span>Code sent to: {maskEmail(userEmail)}</span>
-                            </>
-                        ) : (
-                            <>
-                                <Phone className="w-4 h-4 text-purple-400" />
-                                <span>Code sent to: {maskPhone(userPhone)}</span>
-                            </>
-                        )}
+                        <Mail className="w-4 h-4 text-purple-400" />
+                        <span>Code sent to: {maskEmail(userEmail)}</span>
                     </div>
                 </div>
 
