@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthService } from '../services/AuthService';
+import { IAuthService } from '../types/interfaces/IAuthService';
 import {
   loginSchema,
   signupSchema,
@@ -15,7 +15,7 @@ import { string } from 'zod';
 import axios from 'axios';
 
 export class AuthController {
-  constructor(private authService: AuthService) { }
+  constructor(private authService: IAuthService) { }
 
   login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

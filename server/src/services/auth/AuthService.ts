@@ -1,11 +1,12 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { IUserRepository, IOTPRepository } from '../repositories/interfaces/index';
-import { } from '../repositories/OTPRepository';
-import { EmailService } from './AuthServices/EmailService';
-import { SMSService } from './AuthServices/SMSService';
-import { GoogleAuthService } from './AuthServices/GoogleAuthService';
-import { GitHubAuthService } from './AuthServices/GitHubAuthService';
+import { IUserRepository, IOTPRepository } from '../../repositories/interfaces/index';
+import { } from '../../repositories/OTPRepository';
+import { EmailService } from './EmailService';
+import { SMSService } from './SMSService';
+import { GoogleAuthService } from './GoogleAuthService';
+import { IGitHubAuthService } from '../../types/interfaces/IGitHubAuthService';
+import { ITokenService } from '../../types/interfaces/ITokenService';
 import {
     LoginRequest,
     SignupRequest,
@@ -19,20 +20,25 @@ import {
     forgotPassword,
     SignupResponse,
     AuthResponse
-} from '../types/index';
+} from '../../types/index';
 
-import { IUser } from '../models/interfaces/Index';
+import { IUser } from '../../models/interfaces/Index';
 import axios from 'axios';
+import { IAuthService } from '../../types/interfaces/IAuthService';
+import { IEmailService } from '../../types/interfaces/IEmailService';
+import { IGoogleAuthService } from '../../types/interfaces/IGoogleAuthService';
+import { ISMSService } from '../../types/interfaces/ISMSService';
 
 
-export class AuthService {
+export class AuthService implements IAuthService {
     constructor(
         private userRepository: IUserRepository,
         private otpRepository: IOTPRepository,
-        private emailService: EmailService,
-        private smsService: SMSService,
-        private googleAuthService: GoogleAuthService,
-        private githubAuthService: GitHubAuthService
+        private emailService: IEmailService,
+        private smsService: ISMSService,
+        private googleAuthService: IGoogleAuthService,
+        private githubAuthService: IGitHubAuthService,
+        private tokenService: ITokenService
     ) { }
 
     async login(data: LoginRequest): Promise<AuthResponse> {
@@ -66,8 +72,8 @@ export class AuthService {
         }
 
         // Generate tokens
-        const token = this.generateAccessToken(user._id);
-        const refreshToken = this.generateRefreshToken(user._id);
+        const token = this.tokenService.generateAccessToken(user._id);
+        const refreshToken = this.tokenService.generateRefreshToken(user._id);
 
         return {
             success: true,
@@ -116,7 +122,7 @@ export class AuthService {
         await this.generateAndSendOTP(user._id, session);
 
         // Generate temp token
-        const tempToken = this.generateTempToken(user._id);
+        const tempToken = this.tokenService.generateTempToken(user._id);
 
         return {
             success: true,
@@ -169,8 +175,8 @@ export class AuthService {
         await this.otpRepository.deleteByUserIdAndType(userId.toString());
 
         // Generate tokens
-        const token = this.generateAccessToken(userId.toString());
-        const refreshToken = this.generateRefreshToken(userId.toString());
+        const token = this.tokenService.generateAccessToken(userId.toString());
+        const refreshToken = this.tokenService.generateRefreshToken(userId.toString());
 
         return {
             success: true,
@@ -250,8 +256,8 @@ export class AuthService {
         }
 
         // Generate token
-        const token = this.generateAccessToken(user._id);
-        const refreshToken = this.generateRefreshToken(user._id)
+        const token = this.tokenService.generateAccessToken(user._id);
+        const refreshToken = this.tokenService.generateRefreshToken(user._id);
 
         return {
             success: true,
@@ -326,8 +332,8 @@ export class AuthService {
         }
 
         // Generate token
-        const token = this.generateAccessToken(user._id);
-        const refreshToken = this.generateRefreshToken(user._id)
+        const token = this.tokenService.generateAccessToken(user._id);
+        const refreshToken = this.tokenService.generateRefreshToken(user._id);
 
         return {
             success: true,
@@ -368,46 +374,6 @@ export class AuthService {
 
     }
 
-    private generateAccessToken(userId: string): string {
-        const payload: AccessTokenPayload = {
-            userId,
-            type: 'access'
-        };
-
-        return jwt.sign(
-            payload,
-            process.env.JWT_SECRET!,
-            { expiresIn: '1h' }
-        );
-    }
-
-    private generateRefreshToken(userId: string): string {
-        const payload: RefreshTokenPayload = {
-            userId,
-            type: 'refresh'
-        };
-
-        return jwt.sign(
-            payload,
-            process.env.JWT_REFRESH_SECRET!,
-            { expiresIn: '7d' }
-        );
-    }
-
-    private generateTempToken(userId: string, purpose: 'otp_verification' | 'password_reset' | 'email_change' = 'otp_verification'): string {
-        const payload: TempTokenPayload = {
-            userId,
-            type: 'temp',
-            purpose
-        };
-
-        return jwt.sign(
-            payload,
-            process.env.JWT_TEMP_SECRET!,
-            { expiresIn: '1h' }
-        );
-    }
-
     async forgotPassword(data: forgotPassword): Promise<{
         success: boolean;
         message: string;
@@ -432,7 +398,7 @@ export class AuthService {
         const session = 'forgot'
         await this.generateAndSendOTP(user._id, session);
 
-        const tempToken = this.generateTempToken(user._id);
+        const tempToken = this.tokenService.generateTempToken(user._id);
 
 
         return {

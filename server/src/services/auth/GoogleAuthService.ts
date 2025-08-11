@@ -1,6 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
+import { IGoogleAuthService } from '../../types/interfaces/IGoogleAuthService';
 
-export class GoogleAuthService {
+export class GoogleAuthService implements IGoogleAuthService {
     private client: OAuth2Client;
 
     constructor() {

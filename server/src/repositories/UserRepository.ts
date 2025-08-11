@@ -96,7 +96,8 @@ export class UserRepository implements IUserRepository {
         Diamond: 0,
         Platinum: 0,
         Gold: 0,
-        Silver: 0
+        Silver: 0,
+        Unranked: 0
       }
     };
 

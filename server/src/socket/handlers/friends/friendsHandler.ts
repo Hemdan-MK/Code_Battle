@@ -373,4 +373,47 @@ export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Ma
             socket.emit('friends_error', { message: 'Failed to fetch friends list' });
         }
     });
+
+    socket.on('search_friends', async (data) => {
+        try {
+            const { userId, query } = data;
+
+            if (userId !== socket.userId) {
+                socket.emit('friends_error', { message: 'Unauthorized request' });
+                return;
+            }
+
+            const user = await User.findById(userId)
+                .populate({
+                    path: 'friends',
+                    match: { username: { $regex: query, $options: 'i' } }
+                })
+                .exec();
+
+            if (!user) {
+                socket.emit('friends_error', { message: 'User not found' });
+                return;
+            }
+
+            const friendsWithStatus = user.friends.map((friend: any) => {
+                const friendId = friend._id.toString();
+                const isOnline = activeUsers.has(friendId);
+
+                return {
+                    id: friendId,
+                    username: friend.username,
+                    avatar: friend.currentAvatar,
+                    status: isOnline ? 'online' : 'offline',
+                    game: friend.currentGame || (isOnline ? 'Online' : 'Offline'),
+                    rank: friend.rank || 'UNRANKED',
+                    lastSeen: friend.lastSeen || friend.updatedAt
+                };
+            });
+
+            socket.emit('friends_list', { friends: friendsWithStatus });
+        } catch (error) {
+            console.error('Error searching friends:', error);
+            socket.emit('friends_error', { message: 'Failed to search friends' });
+        }
+    });
 };

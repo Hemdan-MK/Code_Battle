@@ -6,6 +6,7 @@ import TeamChat from "./TeamChat";
 import TeamSelectionModal from "./TeamSelectionModal";
 import InviteModal from "./InviteModal";
 import { useSocket } from "@/hooks/useSocket";
+import { useToast } from "@/hooks/useToast";
 
 const gameTypes = [
     { id: 'solo', name: 'Solo Queue', description: '1v1 battles' },
@@ -59,6 +60,7 @@ const GameModeSelection = () => {
     const user = getUser();
     const currentUserId = user.id;
     const socket = useSocket();
+    const { showToast } = useToast();
 
     // Initialize socket connection
     useEffect(() => {
@@ -170,7 +172,7 @@ const GameModeSelection = () => {
 
         socket.on('team_error', (data) => {
             console.error('Team error:', data.message);
-            // Show error message to user
+            showToast(data.message, 'error');
         });
 
         // ADD A CATCH-ALL LISTENER FOR DEBUGGING
@@ -183,7 +185,7 @@ const GameModeSelection = () => {
             console.log("Cleaning up socket connection");
             socket.off(); // Remove all listeners
         };
-    }, [currentUserId, socket]);
+    }, [currentUserId, socket, showInviteModal, inviteData]);
 
     // ADD USEEFFECT TO MONITOR STATE CHANGES
     useEffect(() => {
@@ -207,12 +209,17 @@ const GameModeSelection = () => {
             return;
         }
 
-        if (!isStarted && selectedMode === 'team3v3' && !team) {
-            console.log("Creating team for game mode:", selectedMode);
-            socket.emit('create_team', {
-                userId: currentUserId,
-                gameMode: selectedMode
-            });
+        if (!isStarted) {
+            if (selectedMode === 'team3v3' && !team) {
+                console.log("Creating team for game mode:", selectedMode);
+                socket.emit('create_team', {
+                    userId: currentUserId,
+                    gameMode: selectedMode
+                });
+            }
+            socket.emit('update_status', { userId: currentUserId, status: 'in game' });
+        } else {
+            socket.emit('update_status', { userId: currentUserId, status: 'online' });
         }
         setIsStarted(!isStarted);
     };
@@ -383,7 +390,7 @@ const GameModeSelection = () => {
                         ) : (
                             <div className="flex flex-col items-center space-y-4">
                                 <div className="text-purple-400 text-lg">
-                                    Create a team to start playing
+                                    You are not in a team. Create one to start playing with friends.
                                 </div>
                                 <button
                                     onClick={createTeam}
@@ -394,7 +401,7 @@ const GameModeSelection = () => {
                                         }`}
                                 >
                                     <Users className="w-5 h-5" />
-                                    <span>CREATE TEAM</span>
+                                    <span>Create Team</span>
                                 </button>
                             </div>
                         )}
