@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { UserRepository } from '../../repositories/UserRepository';
 import { CreateUser, UpdateUser, GetUsers } from '../../types/index';
 
-export class UserService {
+export class UserAdminService {
 
     constructor(private userRepository: UserRepository) { }
 

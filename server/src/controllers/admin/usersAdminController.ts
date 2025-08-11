@@ -1,7 +1,7 @@
 // controllers/userController.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../../services/admin/userAdminService';
+import { UserAdminService } from '../../services/admin/userAdminService';
 import {
     GetUsers,
     CreateUser,
@@ -9,9 +9,9 @@ import {
 } from '../../types/index';
 
 
-export class UsersController {
+export class UsersAdminController {
 
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserAdminService) { }
 
     /**
      * Get paginated users with filters

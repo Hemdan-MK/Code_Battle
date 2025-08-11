@@ -75,7 +75,6 @@ export class AuthService {
             token,
             user: {
                 id: user._id,
-                name: user.name,
                 email: user.email,
                 username: user.username,
                 phone: user.phone
@@ -103,7 +102,6 @@ export class AuthService {
 
         // Create user
         const user = await this.userRepository.create({
-            name: username, // Using username as name for now
             email,
             username,
             phone: Number(phoneNumber),
@@ -126,7 +124,6 @@ export class AuthService {
             tempToken,
             user: {
                 id: user._id,
-                name: user.name,
                 email: user.email,
                 username: user.username,
                 phone: user.phone
@@ -181,7 +178,6 @@ export class AuthService {
             token,
             user: {
                 id: user._id,
-                name: user.name,
                 email: user.email,
                 username: user.username,
                 phone: user.phone
@@ -218,7 +214,7 @@ export class AuthService {
 
         const userData = {
             email: googleUser.email,
-            name: googleUser.name,
+            username: googleUser.name,
             picture: googleUser.picture,
             googleId: googleUser.sub,
         };
@@ -239,7 +235,6 @@ export class AuthService {
                 const hashedPassword = await bcrypt.hash(randomPassword, 12);
 
                 user = await this.userRepository.create({
-                    name: userData.name,
                     email: userData.email,
                     username: userData.email.split('@')[0],
                     phone: 0,   // change in edit
@@ -264,7 +259,6 @@ export class AuthService {
             token,
             user: {
                 id: user._id,
-                name: user.name,
                 email: user.email,
                 username: user.username,
                 phone: user.phone
@@ -321,7 +315,6 @@ export class AuthService {
                 const hashedPassword = await bcrypt.hash(randomPassword, 12);
                 // Create new user
                 user = await this.userRepository.create({
-                    name: githubUser.name || githubUser.login,
                     email: githubUser.email || '',
                     username: githubUser.login,
                     password: hashedPassword,
@@ -342,7 +335,6 @@ export class AuthService {
             token,
             user: {
                 id: user._id,
-                name: user.name,
                 email: user.email,
                 username: user.username,
                 phone: user.phone

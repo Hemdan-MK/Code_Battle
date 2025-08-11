@@ -1,11 +1,12 @@
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import { IUser } from "./interfaces/Index";
-import { number } from "zod";
+import { number, string } from "zod";
 
 const userSchema = new Schema<IUser>({
     token: { type: String, required: false },
     username: { type: String, required: true },
-    refreshToken: { type: String,},
+    tag: { type: String, default: "codeBattle" },
+    refreshToken: { type: String, },
     email: { type: String, required: true, unique: true },
     phone: { type: Number, required: true, },
     password: { type: String, required: true },
@@ -19,6 +20,7 @@ const userSchema = new Schema<IUser>({
         default: 'offline'
     },
     rank: { type: String, default: 'Unranked' },
+    level: { type: Number, default: 1 },
     xp: {
         type: Number,
         default: 10
@@ -27,20 +29,19 @@ const userSchema = new Schema<IUser>({
         type: Boolean,
         default: false
     },
+    currentAvatar: { type: Schema.Types.ObjectId, ref: 'Avatar', default: null },
+    currentTitle: { type: String, default: "Noobie" },
 
-    // GamePlayed: { type: Number, default: 0 },
-    // Rank: { type: String, default: null },
-    // Profileimage: { type: String, default: null },
-    // CurrentAvatar: { type: Schema.Types.ObjectId, ref: 'Avatar', default: null },
-    // CurrentTitle: { type: String, default: null },
-    // Level: { type: Number, default: 1 },
-    // Online: { type: Boolean, default: false },
-    // XP: { type: Number, default: 0 },
-    // collections: {
-    //     Avatar: [{ type: Schema.Types.ObjectId, ref: 'Avatar' }],
-    //     Title: [{ type: Schema.Types.ObjectId, ref: 'Title' }]
-    // },
-    Timestamp: { type: Date, default: Date.now },
+    collections: {
+        Avatar: [{ type: Schema.Types.ObjectId, ref: 'Avatar' }],
+        Title: [{ type: Schema.Types.ObjectId, ref: 'Title' }]
+    },
+
+    gamePlayed: { type: Number, default: 0 },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    pendingFriendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+}, {
+    timestamps: true
 });
 
 const UserModel = model<IUser>("User", userSchema);

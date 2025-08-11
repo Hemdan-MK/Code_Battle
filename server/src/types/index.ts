@@ -37,7 +37,6 @@ export interface AuthResponse {
     token: string;
     user: {
         id: string;
-        name: string;
         email: string;
         username: string;
         phone: Number | null;
@@ -51,7 +50,6 @@ export interface SignupResponse {
     tempToken: string;
     user: {
         id: string;
-        name: string;
         email: string;
         username: string;
         phone: number | null;

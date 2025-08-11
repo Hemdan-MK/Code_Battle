@@ -1,10 +1,10 @@
-import { Document, ObjectId } from "mongoose";
+import { Document, ObjectId, Types } from "mongoose";
 
 export interface IUser extends Document {
     _id: string;
     token: string;
     username: string;
-    name: string;
+    tag: string;
     refreshToken?: string;
     email: string;
     password: string;
@@ -17,24 +17,20 @@ export interface IUser extends Document {
     status: 'online' | 'offline',
     rank: 'Diamond' | 'Platinum' | 'Gold' | 'Silver' | 'Unranked',
     xp: number,
+    level?: number;
     isBanned: boolean;
-
-
-    
-    // reports: number,
-    // GamePlayed: Number | null;
-    // Rank: string | null;
-    // Profileimage: string | null;
-    // CurrentAvatar: ObjectId | null;
-    // CurrentTitle: string | null;
-    // Level: Number | null;
-    // Online: Boolean | null;
-    // XP: Number | null;
-    // collections: {
-    //     Avatar: ObjectId[] | null;
-    //     Title: ObjectId[] | null;
-    // };
-    Timestamp: Date | null;
+    currentAvatar?: Types.ObjectId | null;
+    currentTitle?: string;
+    currentGame?: 'In Game' | 'Available' ; 
+    collections?: {
+        Avatar: Array<Types.ObjectId>;
+        Title: Array<Types.ObjectId>;
+    };
+    gamePlayed?: number;
+    friends: Types.ObjectId[];
+    pendingFriendRequests?: Types.ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface IOTP extends Document {

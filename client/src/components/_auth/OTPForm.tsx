@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../../redux/store';
 import { verifyOTPThunk, resendOTPThunk } from '../../redux/thunk';
-import { clearError } from '../../redux/slice';
+import { clearError } from '../../redux/authSlice';
 import {
     Mail,
     ChevronRight,

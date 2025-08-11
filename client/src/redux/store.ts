@@ -1,12 +1,13 @@
 
 // redux/store.ts
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './slice';
+import authReducer from './authSlice';
+import chatSlice from './chatSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    // Add other reducers here
+    chat: chatSlice
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

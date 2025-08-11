@@ -53,7 +53,6 @@ const Header: React.FC = () => {
     const handleLogout = () => {
         // Remove token from localStorage
         localStorage.removeItem('userToken');
-        localStorage.removeItem('token');
         localStorage.removeItem('authToken');
 
         // Update auth state

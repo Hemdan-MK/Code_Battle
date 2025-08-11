@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import useDeviceOrientation from '@/hooks/useDeviceOrientation';
 import RotateDeviceMessage from '@/components/common/RotateDeviceMessage';
-import Sidebar from '@/components/profile/Sidebar';
-import SecuritySection from '@/components/profile/SecuritySection';
-import RewardsSection from '@/components/profile/RewardsSection';
+import Sidebar from '@/components/user/profile/Sidebar';
+import SecuritySection from '@/components/user/profile/SecuritySection';
+import RewardsSection from '@/components/user/profile/RewardsSection';
 
 
 const ProfilePage: React.FC = () => {

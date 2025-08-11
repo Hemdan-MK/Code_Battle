@@ -48,3 +48,22 @@ export const newPasswordSchema = z.object({
         .min(8, 'Password must be at least 8 characters')
         .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number'),
 })
+
+
+export const updateUsername = z.object({
+    username: z.string()
+        .min(3, 'Username must be at least 3 characters')
+        .max(20, 'Username must be less than 20 characters')
+        .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+    tag: z.string()
+        .min(2, 'Tag must be at least 2 characters')
+})
+
+export const updatePassword = z.object({
+    currentPassword: z.string()
+        .min(8, 'Password must be at least 8 characters')
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number'),
+    newPassword: z.string()
+        .min(8, 'Password must be at least 8 characters')
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one lowercase letter, one uppercase letter, and one number'),
+})

@@ -1,6 +1,6 @@
 // services/admin/userService.ts
 
-import api from "@/services/axios/axios";
+import api from "@/services/_axios/axios";
 import type { User, UserStats, UserStatus, CreateUser, UpdateUser } from "@/types/index";
 
 interface GetUsersResponse {

@@ -1,15 +1,15 @@
 // routes/admin/user.routes.ts
 
 import { Router } from "express";
-import { UsersController } from "../../controllers/admin/usersAdminController";
-import { UserService } from "../../services/admin/userAdminService";
+import { UsersAdminController } from "../../controllers/admin/usersAdminController";
+import { UserAdminService } from "../../services/admin/userAdminService";
 import { UserRepository } from "../../repositories/UserRepository";
 
 
 const router = Router();
 const userRepository = new UserRepository()
-const userService = new UserService(userRepository)
-const usersController = new UsersController(userService);
+const userService = new UserAdminService(userRepository)
+const usersController = new UsersAdminController(userService);
 
 
 router.get("/users", usersController.getUsers.bind(usersController));

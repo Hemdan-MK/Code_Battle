@@ -931,7 +931,7 @@ const UserManagement: React.FC = () => {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                                        {user.Timestamp ? new Date(user.Timestamp).toLocaleString() : 'Unknown'}                                    </td>
+                                        {user.updatedAt ? new Date(user.updatedAt).toLocaleString() : 'Unknown'}                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                         <button
                                             onClick={() => handleViewUser(user._id)}

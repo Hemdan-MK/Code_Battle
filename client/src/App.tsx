@@ -2,7 +2,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import AppRouter from './router/Router';
 import { useEffect } from 'react';
-import { clearError } from './redux/slice';
+import { clearError } from './redux/authSlice';
 import { type RootState } from './redux/store';
 import { ToastProvider, useToast } from './hooks/useToast';
 

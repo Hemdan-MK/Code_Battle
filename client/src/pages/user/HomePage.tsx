@@ -1,8 +1,8 @@
 import useDeviceOrientation from '@/hooks/useDeviceOrientation';
 import RotateDeviceMessage from '@/components/common/RotateDeviceMessage';
-import FriendsList from '@/components/home/FriendsList';
-import GameModeSelection from '@/components/home/GameModeSelection';
-import ProfileOverview from '@/components/home/ProfileOverview';
+import FriendsList from '@/components/user/home/FriendsList';
+import GameModeSelection from '@/components/user/home/GameModeSelection';
+import ProfileOverview from '@/components/user/home/ProfileOverview';
 
 
 const HomePage = () => {

@@ -2,7 +2,7 @@
 
 import { getTempToken, removeTempToken, setTempToken } from "@/utils/tokenUtils";
 
-import api from "../axios/axios";
+import api from "../_axios/axios";
 
 export interface AuthResponse {
     success: boolean;
@@ -10,7 +10,6 @@ export interface AuthResponse {
     token: string;
     user: {
         id: string;
-        name: string;
         email: string;
         username: string;
         phoneNumber: string;
@@ -36,7 +35,6 @@ interface SignupResponse {
     tempToken: string;
     user: {
         id: string;
-        name: string;
         email: string;
         username: string;
         phoneNumber: string;
@@ -54,7 +52,6 @@ interface OTPVerificationResponse {
     token: string;
     user: {
         id: string;
-        name: string;
         email: string;
         username: string;
         phoneNumber: string;
@@ -75,7 +72,6 @@ interface GoogleAuthResponse {
     token: string;
     user: {
         id: string;
-        name: string;
         email: string;
         username: string;
         phoneNumber: string;
@@ -93,7 +89,6 @@ interface GitHubAuthResponse {
     token: string;
     user: {
         id: string;
-        name: string;
         email: string;
         username: string;
         phoneNumber: string;

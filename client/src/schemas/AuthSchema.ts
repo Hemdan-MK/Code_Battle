@@ -29,5 +29,5 @@ export const loginSchema = z.object({
 });
 
 export const signupSchema = loginSchema.extend({
-  name: z.string().min(1, { message: "Name is required" }),
+  username: z.string().min(1, { message: "Name is required" }),
 });
