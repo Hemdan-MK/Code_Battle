@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { getToken } from "@/utils/tokenUtils";
 import { Crown, Shield, Star, Target, Trophy, Zap } from "lucide-react";
-import { io, Socket } from "socket.io-client";
+import { useSocket } from "@/hooks/useSocket";
 
 interface User {
     _id: string;
@@ -25,10 +24,8 @@ interface User {
 
 const ProfileOverview = () => {
     const [user, setUser] = useState<User | null>(null);
-    const [socket, setSocket] = useState<Socket | null>(null);
+    const { socket, isConnected } = useSocket();
     const [isLoading, setIsLoading] = useState(true);
-
-    const SOCKET_URL = 'http://localhost:3000';
 
     // Calculate XP progress for current level
     const calculateXPForLevel = (level: number) => {
@@ -81,62 +78,25 @@ const ProfileOverview = () => {
     };
 
     useEffect(() => {
-        const initializeSocket = async () => {
-            try {
-                const token = await getToken();
-                if (!token) {
-                    console.error('No user token data found');
-                    setIsLoading(false);
-                    return;
-                }
+        if (socket && isConnected) {
+            socket.emit('get_Details');
 
-                const newSocket = io(SOCKET_URL, {
-                    auth: {
-                        token
-                    }
-                });
-
-                newSocket.on('connect', () => {
-                    console.log('Connected to socket');
-                    newSocket.emit('get_Details');
-                });
-
-                newSocket.on('detail_resp', (data: { user: User }) => {
-                    setUser(data.user);
-                    setIsLoading(false);
-                });
-
-                newSocket.on('error', (error: { message: string }) => {
-                    console.error('Socket error:', error);
-                    setIsLoading(false);
-                });
-
-                newSocket.on('connect_error', (error: { message: string }) => {
-                    console.error('Connection error:', error);
-                    setIsLoading(false);
-                });
-
-                setSocket(newSocket);
-
-                return () => {
-                    newSocket.disconnect();
-                };
-            } catch (error) {
-                console.error('Error initializing socket:', error);
+            socket.on('detail_resp', (data: { user: User }) => {
+                setUser(data.user);
                 setIsLoading(false);
-            }
-        };
+            });
 
-        initializeSocket();
-    }, []);
+            socket.on('error', (error: { message: string }) => {
+                console.error('Socket error:', error);
+                setIsLoading(false);
+            });
 
-    useEffect(() => {
-        return () => {
-            if (socket) {
-                socket.disconnect();
-            }
-        };
-    }, [socket]);
+            socket.on('connect_error', (error: { message: string }) => {
+                console.error('Connection error:', error);
+                setIsLoading(false);
+            });
+        }
+    }, [socket, isConnected]);
 
     if (isLoading) {
         return (

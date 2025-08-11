@@ -122,13 +122,13 @@ const SignUpPage: React.FC = () => {
         </div>
 
         {/* Right Side - SignUp Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 md:p-6 lg:p-8">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 md:p-8">
           <div className={`
             w-full max-w-md transform transition-all duration-1000 delay-500
             ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}
           `}>
             {/* Glass Morphism Container */}
-            <div className="backdrop-blur-xl bg-black/40 border border-purple-800/50 rounded-2xl p-6 md:p-8 shadow-2xl shadow-purple-500/10">
+            <div className="backdrop-blur-xl bg-black/40 border border-purple-800/50 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl shadow-purple-500/10">
               <SignUpForm  />
             </div>
 

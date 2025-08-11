@@ -18,7 +18,7 @@ import {
 
 
 
-const landingPage = () => {
+const LandingPage = () => {
     // const [email, setEmail] = useState('');
     const [isVisible, setIsVisible] = useState(false);
     const navigate = useNavigate();
@@ -146,12 +146,12 @@ const landingPage = () => {
                     </div>
                 </div>
 
-                <div className={`relative z-10 text-center px-4 transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+                <div className={`relative z-10 text-center px-4 sm:px-6 lg:px-8 transform transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
                     <div className="mb-8">
-                        <h1 className="text-6xl md:text-8xl font-black mb-4 bg-gradient-to-r from-purple-400 via-purple-300 to-white bg-clip-text text-transparent animate-pulse">
+                        <h1 className="text-5xl sm:text-6xl md:text-8xl font-black mb-4 bg-gradient-to-r from-purple-400 via-purple-300 to-white bg-clip-text text-transparent animate-pulse">
                             CODE<span className="text-purple-500">BATTLE</span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 font-light tracking-wide">
+                        <p className="text-lg sm:text-xl md:text-2xl text-gray-300 font-light tracking-wide">
                             Where Code Meets Combat
                         </p>
                     </div>
@@ -159,7 +159,7 @@ const landingPage = () => {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                         <button
                             onClick={toHome}
-                            className="group px-8 py-4 bg-gradient-to-r from-purple-700 to-purple-600 rounded-lg font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 border border-purple-500"
+                            className="group px-6 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-purple-700 to-purple-600 rounded-lg font-bold text-base sm:text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/50 border border-purple-500"
                         >
                             <span className="flex items-center gap-2">
                                 <Sword className="w-5 h-5 group-hover:rotate-12 transition-transform" />
@@ -167,7 +167,7 @@ const landingPage = () => {
                                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </span>
                         </button>
-                        <button onClick={scrollToFeatures} className="group px-8 py-4 bg-gray-900 border border-purple-800 rounded-lg font-bold text-lg transition-all duration-300 hover:bg-gray-800 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-400/30">
+                        <button onClick={scrollToFeatures} className="group px-6 py-3 sm:px-8 sm:py-4 bg-gray-900 border border-purple-800 rounded-lg font-bold text-base sm:text-lg transition-all duration-300 hover:bg-gray-800 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-400/30">
                             <span className="flex items-center gap-2">
                                 <ChevronsDown className="w-5 h-5 group-hover:scale-110 transition-transform" />
                                 LEARN MORE
@@ -190,13 +190,13 @@ const landingPage = () => {
             </div>
 
             {/* Features Section */}
-            <section id='features' className="py-20 bg-black">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-purple-400 to-purple-200 bg-clip-text text-transparent">
+            <section id='features' className="py-16 sm:py-20 bg-black">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-center mb-12 sm:mb-16 bg-gradient-to-r from-purple-400 to-purple-200 bg-clip-text text-transparent">
                         Battle Features
                     </h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                         {features.map((feature, index) => (
                             <div
                                 key={index}
@@ -349,4 +349,4 @@ const landingPage = () => {
     );
 };
 
-export default landingPage;
+export default LandingPage;
