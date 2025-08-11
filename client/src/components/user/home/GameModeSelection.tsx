@@ -1,18 +1,18 @@
 import { Play, Square, Users } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import { getToken, getUser } from "@/utils/tokenUtils";
+import { useState, useEffect } from "react";
+import { getUser } from "@/utils/tokenUtils";
 import AvatarCard from "./AvatarCard";
 import TeamChat from "./TeamChat";
 import TeamSelectionModal from "./TeamSelectionModal";
 import InviteModal from "./InviteModal";
-import { io } from "socket.io-client";
+import { useSocket } from "@/hooks/useSocket";
 
 const gameTypes = [
     { id: 'solo', name: 'Solo Queue', description: '1v1 battles' },
     { id: 'team3v3', name: 'Team 3v3', description: '3v3 team battles' },
 ];
 
-const TeamSelection = ({ gameType, team, onInviteFriend, onLeaveTeam, onToggleReady, currentUserId }) => {
+const TeamSelection = ({ team, onInviteFriend, onToggleReady, currentUserId }) => {
     const maxTeamSize = 3;
     const emptySlots = maxTeamSize - (team?.members?.length || 0);
     const isLeader = team?.leader === currentUserId;
@@ -58,27 +58,14 @@ const GameModeSelection = () => {
 
     const user = getUser();
     const currentUserId = user.id;
-    const token = getToken();
-
-    const socketRef = useRef(null);
+    const socket = useSocket();
 
     // Initialize socket connection
     useEffect(() => {
-        if (!token || !currentUserId) {
-            console.error("No token or user ID available");
+        if (!socket || !currentUserId) {
+            console.error("No socket or user ID available");
             return;
         }
-
-        const socket = io('http://localhost:3000', {
-            auth: { token },
-            transports: ['websocket', 'polling'],
-            timeout: 20000,
-            reconnection: true,
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
-        });
-
-        socketRef.current = socket;
 
         // Connection handlers
         socket.on('connect', () => {
@@ -195,9 +182,8 @@ const GameModeSelection = () => {
         return () => {
             console.log("Cleaning up socket connection");
             socket.off(); // Remove all listeners
-            socket.disconnect();
         };
-    }, [currentUserId, token]);
+    }, [currentUserId, socket]);
 
     // ADD USEEFFECT TO MONITOR STATE CHANGES
     useEffect(() => {
@@ -216,14 +202,14 @@ const GameModeSelection = () => {
     };
 
     const handleStart = () => {
-        if (!socketRef.current || !isConnected) {
+        if (!socket || !isConnected) {
             console.error("Socket not connected");
             return;
         }
 
         if (!isStarted && selectedMode === 'team3v3' && !team) {
             console.log("Creating team for game mode:", selectedMode);
-            socketRef.current.emit('create_team', {
+            socket.emit('create_team', {
                 userId: currentUserId,
                 gameMode: selectedMode
             });
@@ -232,19 +218,19 @@ const GameModeSelection = () => {
     };
 
     const handleInviteFriend = () => {
-        if (!socketRef.current || !isConnected) {
+        if (!socket || !isConnected) {
             console.error("Socket not connected");
             return;
         }
 
         console.log("Requesting friends list for invite");
         // Refresh friends list before showing modal
-        socketRef.current.emit('get_friends_list', { userId: currentUserId });
+        socket.emit('get_friends_list', { userId: currentUserId });
         setShowTeamModal(true);
     };
 
     const handleSelectFriend = (friendId) => {
-        if (!socketRef.current || !isConnected) {
+        if (!socket || !isConnected) {
             console.error("Socket not connected");
             return;
         }
@@ -257,7 +243,7 @@ const GameModeSelection = () => {
         console.log("🚀 Sending team invite to friend:", friendId, "for team:", team.id);
         console.log("🚀 Current user ID:", currentUserId);
 
-        socketRef.current.emit('send_team_invite', {
+        socket.emit('send_team_invite', {
             senderId: currentUserId,
             receiverId: friendId,
             teamId: team.id
@@ -267,19 +253,19 @@ const GameModeSelection = () => {
     };
 
     const handleLeaveTeam = () => {
-        if (!socketRef.current || !isConnected) {
+        if (!socket || !isConnected) {
             console.error("Socket not connected");
             return;
         }
 
         if (team) {
             console.log("Leaving team:", team.id);
-            socketRef.current.emit('leave_team', { userId: currentUserId });
+            socket.emit('leave_team', { userId: currentUserId });
         }
     };
 
     const handleToggleReady = () => {
-        if (!socketRef.current || !isConnected) {
+        if (!socket || !isConnected) {
             console.error("Socket not connected");
             return;
         }
@@ -288,7 +274,7 @@ const GameModeSelection = () => {
             const currentMember = team.members.find(m => m.userId === currentUserId);
             console.log("Toggling ready status from:", currentMember?.ready, "to:", !currentMember?.ready);
 
-            socketRef.current.emit('update_team_ready_status', {
+            socket.emit('update_team_ready_status', {
                 userId: currentUserId,
                 ready: !currentMember?.ready
             });
@@ -296,7 +282,7 @@ const GameModeSelection = () => {
     };
 
     const handleInviteResponse = (accepted) => {
-        if (!socketRef.current || !isConnected) {
+        if (!socket || !isConnected) {
             console.error("Socket not connected");
             return;
         }
@@ -304,7 +290,7 @@ const GameModeSelection = () => {
         if (inviteData) {
             console.log("Responding to invite:", accepted ? "accepted" : "rejected");
 
-            socketRef.current.emit('respond_team_invite', {
+            socket.emit('respond_team_invite', {
                 userId: currentUserId,
                 teamId: inviteData.teamId,
                 accepted
@@ -315,20 +301,19 @@ const GameModeSelection = () => {
     };
 
     const createTeam = () => {
-        if (!socketRef.current || !isConnected) {
+        if (!socket || !isConnected) {
             console.error("Socket not connected");
             return;
         }
 
         console.log("Creating team manually for game mode:", selectedMode);
-        socketRef.current.emit('create_team', {
+        socket.emit('create_team', {
             userId: currentUserId,
             gameMode: selectedMode
         });
     };
 
     const isInTeam = !!team;
-    const isTeamLeader = team?.leader === currentUserId;
     const canStart = selectedMode === 'solo' || (isInTeam && team.members.every(m => m.ready));
 
     // Filter online friends for team invitations
@@ -390,10 +375,8 @@ const GameModeSelection = () => {
                     <>
                         {isInTeam ? (
                             <TeamSelection
-                                gameType={selectedMode}
                                 team={team}
                                 onInviteFriend={handleInviteFriend}
-                                onLeaveTeam={handleLeaveTeam}
                                 onToggleReady={handleToggleReady}
                                 currentUserId={currentUserId}
                             />
@@ -495,7 +478,6 @@ const GameModeSelection = () => {
             )}
 
             {/* Invite Modal - ADD MORE DEBUG INFO */}
-            {console.log("🔍 Rendering - showInviteModal:", showInviteModal, "inviteData:", inviteData)}
             {showInviteModal && inviteData && (
                 <InviteModal
                     inviteData={inviteData}

@@ -1,6 +1,6 @@
 // socket/messaging/messagingHandler.ts
 import { Socket, Server } from 'socket.io';
-import { IActiveUser } from '../store/userStore';
+import { IActiveUser } from '../../store/userStore';
 
 export const setupMessagingHandlers = (socket: Socket, io: Server, activeUsers: Map<string, IActiveUser>) => {
 

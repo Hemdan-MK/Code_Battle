@@ -1,14 +1,13 @@
 // src/components/auth/LoginForm.tsx
-const githubClient = import.meta.env.VITE_GITHUB_CLIENT_ID;
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 // const googleClientId = "451229912614-d72se1q4om0evfru0h2tb95p2qa7388u.apps.googleusercontent.com";
 const googleRedirectUri = `${window.location.origin}/auth/google/callback`;
 
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { loginThunk, githubAuthThunk, googleAuthThunk } from '../../redux/thunk'; // Updated import names
+import { loginThunk, googleAuthThunk } from '../../redux/thunk'; // Updated import names
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../../redux/store';
 import {
@@ -19,8 +18,7 @@ import {
   Sword,
   Shield,
   ChevronRight,
-  AlertCircle,
-  Github
+  AlertCircle
 } from 'lucide-react';
 
 // Zod schema for login form validation
@@ -44,7 +42,7 @@ const LoginForm = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [oauthLoading, setOauthLoading] = useState<'github' | 'google' | null>(null);
+  const [oauthLoading] = useState<'github' | 'google' | null>(null);
 
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -116,28 +114,6 @@ const LoginForm = () => {
     }
   };
 
-  // Updated GitHub login handler
-  const handleGithubLogin = async () => {
-    try {
-      setOauthLoading('github');
-      setErrors({});
-
-      if (!githubClient) {
-        throw new Error("GitHub Client ID is missing in .env");
-      }
-
-      const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${githubClient}&redirect_uri=${encodeURIComponent(window.location.origin + '/auth/github/callback')}&scope=user:email`;
-
-      window.location.href = githubAuthUrl;
-    } catch (error) {
-      console.error('GitHub login error:', error);
-      setErrors({
-        general: typeof error === 'string' ? error : 'GitHub login failed. Please try again.',
-      });
-      setOauthLoading(null);
-    }
-  };
-
   const handleGoogleLogin = () => {
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${googleClientId}&redirect_uri=${encodeURIComponent(
       googleRedirectUri
@@ -148,7 +124,7 @@ const LoginForm = () => {
     const left = window.screenX + (window.innerWidth - width) / 2;
     const top = window.screenY + (window.innerHeight - height) / 2;
 
-    const popup = window.open(
+    window.open(
       googleAuthUrl,
       'GoogleLoginPopup',
       `width=${width},height=${height},left=${left},top=${top}`
@@ -176,7 +152,7 @@ const LoginForm = () => {
               setTimeout(() => {
                 navigate('/signup-success', {
                   state: {
-                    username : result.user.name,
+                    username : result.user.username,
                     email: result.user.email,
                     message: 'Account verified successfully!',
                     isSignupComplete: true

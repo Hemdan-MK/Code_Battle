@@ -1,7 +1,7 @@
 // socket/status/statusHandler.ts
 import { Socket, Server } from 'socket.io';
-import User from '../../models/User';
-import { IActiveUser } from '../store/userStore';
+import User from '../../../models/User';
+import { IActiveUser } from '../../store/userStore';
 
 export const setupStatusHandlers = (socket: Socket, io: Server, activeUsers: Map<string, IActiveUser>) => {
 

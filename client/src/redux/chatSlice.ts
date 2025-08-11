@@ -2,8 +2,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import { logoutThunk } from "./thunk";
 
-import { type ChatState, type Message } from "./interface/type";     // interface shown above
-
 const initialState = {
     individual: {}, match: {},
      error: null, // Add this to your initial state

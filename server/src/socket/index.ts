@@ -1,14 +1,22 @@
-// socket/socketManager.ts
 import { Server } from 'socket.io';
-import { setupAuth } from './auth/authHandler';
-import { setupFriendsHandlers } from './friends/friendsHandler';
-import { setupMessagingHandlers } from './messaging/messagingHandler';
-import { setupTeamHandlers } from './team/teamHandler';
-import { setupStatusHandlers } from './status/statusHandler';
-import { handleDisconnect } from './disconnect/disconnectHandler';
+import { createServer } from 'http';
+import { setupAuth } from './handlers/auth/authHandler';
+import { setupFriendsHandlers } from './handlers/friends/friendsHandler';
+import { setupMessagingHandlers } from './handlers/messaging/messagingHandler';
+import { setupTeamHandlers } from './handlers/team/teamHandler';
+import { setupStatusHandlers } from './handlers/status/statusHandler';
+import { handleDisconnect } from './handlers/disconnect/disconnectHandler';
 import { activeUsers } from './store/userStore';
 
-export const setupSocketHandlers = (io: Server) => {
+export const initSocket = (server: ReturnType<typeof createServer>) => {
+    const io = new Server(server, {
+        cors: {
+            origin: process.env.CLIENT_URL || "http://localhost:5173",
+            methods: ["GET", "POST"],
+            credentials: true
+        }
+    });
+
     // Setup authentication middleware
     setupAuth(io);
 
@@ -34,4 +42,6 @@ export const setupSocketHandlers = (io: Server) => {
             console.error('Socket error:', error);
         });
     });
+
+    return io;
 };

@@ -1,7 +1,7 @@
 // socket/team/teamHandler.ts
 import { Socket, Server } from 'socket.io';
-import User from '../../models/User';
-import { IActiveUser, activeTeams, userTeams } from '../store/userStore';
+import User from '../../../models/User';
+import { IActiveUser, activeTeams, userTeams } from '../../store/userStore';
 
 export const setupTeamHandlers = (socket: Socket, io: Server, activeUsers: Map<string, IActiveUser>) => {
 

@@ -1,4 +1,4 @@
-import { X, Users, Crown } from "lucide-react";
+import { X, Users } from "lucide-react";
 
 const TeamSelectionModal = ({ friends, onSelectFriend, onClose }) => {
     console.log("TeamSelectionModal - All friends:", friends);
@@ -48,7 +48,7 @@ const TeamSelectionModal = ({ friends, onSelectFriend, onClose }) => {
                                             alt={friend.username}
                                             className="w-6 h-6 rounded-full object-cover"
                                             onError={(e) => {
-                                                e.target.src = '/image/default-avatar.webp';
+                                                (e.target as HTMLImageElement).src = '/image/default-avatar.webp';
                                             }}
                                         />
                                         <div className="flex-1">
@@ -72,7 +72,7 @@ const TeamSelectionModal = ({ friends, onSelectFriend, onClose }) => {
                                             alt={friend.username}
                                             className="w-10 h-10 rounded-full object-cover"
                                             onError={(e) => {
-                                                e.target.src = '/image/default-avatar.webp';
+                                                (e.target as HTMLImageElement).src = '/image/default-avatar.webp';
                                             }}
                                         />
                                         <div>

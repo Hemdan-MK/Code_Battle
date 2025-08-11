@@ -1,5 +1,5 @@
-import React, { type JSX } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LandingPage from '@/pages/user/LandingPage';
 import HomePage from '@/pages/user/HomePage';

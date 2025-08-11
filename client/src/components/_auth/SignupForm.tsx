@@ -17,8 +17,7 @@ import {
     ChevronRight,
     AlertCircle,
     CheckCircle,
-    UserPlus,
-    X
+    UserPlus
 } from 'lucide-react';
 
 // Zod schema for signup form validation
@@ -68,7 +67,6 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSuccess, setIsSuccess] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();

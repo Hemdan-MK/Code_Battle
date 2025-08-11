@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Users,
   Trophy,
@@ -18,14 +18,14 @@ import {
 import Dashboard from '@/components/adminSession/dashboard';
 import UserManagement from '@/components/adminSession/userManagement/main';
 import { logoutThunk } from '@/redux/thunk';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '@/redux/hooks';
 
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState('dashboard');
 
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   async function logout() {
     await dispatch(logoutThunk())
   }

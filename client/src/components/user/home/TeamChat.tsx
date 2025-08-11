@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, MessageCircle } from "lucide-react";
-import { socket } from "@/utils/socket";
+import { useSocket } from "@/hooks/useSocket";
 
 const TeamChat = ({ team, currentUserId }) => {
+    const socket = useSocket();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
 
@@ -26,7 +26,7 @@ const TeamChat = ({ team, currentUserId }) => {
         return () => {
             socket.off('team_message_received');
         };
-    }, []);
+    }, [socket]);
 
     const handleSendMessage = () => {
         if (!newMessage.trim() || !team) return;

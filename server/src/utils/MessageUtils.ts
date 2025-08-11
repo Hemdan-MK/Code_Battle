@@ -1,5 +1,6 @@
 // utils/messageUtils.js
-const Message = require('../models/Message'); // Adjust path as needed
+import mongoose from 'mongoose';
+import Message from '../models/Message'; // Adjust path as needed
 
 class MessageUtils {
 
@@ -28,8 +29,8 @@ class MessageUtils {
                         messageType: 'private',
                         isDeleted: false,
                         $or: [
-                            { senderId: mongoose.Types.ObjectId(userId) },
-                            { receiverId: mongoose.Types.ObjectId(userId) }
+                            { senderId: new mongoose.Types.ObjectId(userId) },
+                            { receiverId: new mongoose.Types.ObjectId(userId) }
                         ]
                     }
                 },
@@ -40,7 +41,7 @@ class MessageUtils {
                     $group: {
                         _id: {
                             $cond: [
-                                { $eq: ['$senderId', mongoose.Types.ObjectId(userId)] },
+                                { $eq: ['$senderId', new mongoose.Types.ObjectId(userId)] },
                                 '$receiverId',
                                 '$senderId'
                             ]
@@ -180,8 +181,8 @@ class MessageUtils {
                 {
                     $match: {
                         $or: [
-                            { senderId: mongoose.Types.ObjectId(userId) },
-                            { receiverId: mongoose.Types.ObjectId(userId) }
+                            { senderId: new mongoose.Types.ObjectId(userId) },
+                            { receiverId: new mongoose.Types.ObjectId(userId) }
                         ],
                         isDeleted: false
                     }
@@ -193,7 +194,7 @@ class MessageUtils {
                         sent: {
                             $sum: {
                                 $cond: [
-                                    { $eq: ['$senderId', mongoose.Types.ObjectId(userId)] },
+                                    { $eq: ['$senderId', new mongoose.Types.ObjectId(userId)] },
                                     1,
                                     0
                                 ]
@@ -202,7 +203,7 @@ class MessageUtils {
                         received: {
                             $sum: {
                                 $cond: [
-                                    { $eq: ['$receiverId', mongoose.Types.ObjectId(userId)] },
+                                    { $eq: ['$receiverId', new mongoose.Types.ObjectId(userId)] },
                                     1,
                                     0
                                 ]
