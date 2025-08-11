@@ -1,6 +1,7 @@
 import { Twilio } from 'twilio';
+import { ISMSService } from '../../types/interfaces/ISMSService';
 
-export class SMSService {
+export class SMSService implements ISMSService {
     private client: Twilio;
 
     constructor() {

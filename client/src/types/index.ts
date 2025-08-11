@@ -9,7 +9,7 @@ export interface DecodedToken {
 // admin side
 // ----------------
 
-export type UserStatus = 'online' | 'offline' | 'banned';
+export type UserStatus = 'online' | 'offline' | 'banned' | 'away' | 'in game';
 export type UserRank = 'Diamond' | 'Platinum' | 'Gold' | 'Silver' | 'Unranked';
 
 export interface User {

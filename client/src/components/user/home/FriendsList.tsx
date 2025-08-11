@@ -1,14 +1,13 @@
-import { MessageCircle, Send, UserMinus, UserPlus, X, AlertCircle, CheckCircle } from "lucide-react";
+import { MessageCircle, Send, UserMinus, UserPlus, X, AlertCircle, CheckCircle, Search } from "lucide-react";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { io } from "socket.io-client";
 import { addIndividualMessage, clearIndividualChat } from '@/redux/chatSlice'
-import { getToken, getUser } from "@/utils/tokenUtils";
+import { getUser } from "@/utils/tokenUtils";
 import { addError } from "@/redux/authSlice";
 import type { RootState } from "@/redux/store";
+import { useSocket } from "@/hooks/useSocket";
 
 // Constants 
-const SOCKET_URL = 'http://localhost:3000';
 const TYPING_TIMEOUT = 1000;
 const DEFAULT_AVATAR = '/image/default-avatar.webp';
 
@@ -18,18 +17,21 @@ const isValidObjectId = (id) => /^[0-9a-fA-F]{24}$/.test(id);
 const getStatusColor = (status) => {
     const colors = {
         'online': 'bg-green-500',
-        'offline': 'bg-purple-500'
+        'offline': 'bg-gray-500',
+        'away': 'bg-yellow-500',
+        'in game': 'bg-red-500'
     };
-    return colors[status] || 'bg-purple-500';
+    return colors[status] || 'bg-gray-500';
 };
 
 const FriendsList = () => {
     const dispatch = useDispatch();
     const messages = useSelector((state: RootState) => state.chat.individual);
+    const socket = useSocket();
 
     // State
-    const [socket, setSocket] = useState(null);
     const [friends, setFriends] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [currentUser, setCurrentUser] = useState({ id: '', username: '' });
     const [chatOpen, setChatOpen] = useState(false);
     const [selectedFriend, setSelectedFriend] = useState(null);
@@ -58,65 +60,24 @@ const FriendsList = () => {
 
     // Socket connection and authentication
     useEffect(() => {
-        const validateTokenAndConnect = async () => {
-            const token = getToken();
-            const username = getUser().username
-
-            if (!token) {
-                dispatch(addError('No authentication token found. Please log in again.'));
-                setLoading(false);
-                return;
-            }
-
-            try {
-                const newSocket = io(SOCKET_URL, {
-                    auth: {
-                        token,
-                        username
-                    }
-                });
-                console.log("-------------------");
-                console.log(newSocket);
-                
-                console.log("-------------------");
-                
-
-                // Auth success handler
-                const handleAuthSuccess = (data) => {
-                    setCurrentUser({
-                        id: data.userId,
-                        username: data.username
-                    });
-                    setSocket(newSocket);
-                    setLoading(false);
-                    // Request friends list
-                    newSocket.emit('get_friends', { userId: data.userId });
-                };
-
-                // Auth error handler
-                const handleAuthError = (data) => {
-                    dispatch(addError(data.message || 'Authentication failed. Please log in again.'));
-                    setLoading(false);
-                    newSocket.disconnect();
-                };
-
-                newSocket.on('auth_success', handleAuthSuccess);
-                newSocket.on('auth_error', handleAuthError);
-
-                return () => {
-                    newSocket.off('auth_success', handleAuthSuccess);
-                    newSocket.off('auth_error', handleAuthError);
-                    newSocket.disconnect();
-                };
-            } catch (error) {
-                console.error('Socket connection error:', error);
-                dispatch(addError('Failed to connect to server. Please try again.'));
-                setLoading(false);
-            }
-        };
-
-        validateTokenAndConnect();
+        const user = getUser();
+        if (user) {
+            setCurrentUser({
+                id: user.id,
+                username: user.username
+            });
+            setLoading(false);
+        } else {
+            dispatch(addError('User not found. Please log in again.'));
+            setLoading(false);
+        }
     }, [dispatch]);
+
+    useEffect(() => {
+        if (socket && currentUser.id) {
+            socket.emit('get_friends', { userId: currentUser.id });
+        }
+    }, [socket, currentUser.id]);
 
     useEffect(() => {
         if (!socket || !currentUser.id) return;
@@ -373,6 +334,12 @@ const FriendsList = () => {
         }
     }, [selectedFriend, socket, currentUser.id]);
 
+    const handleSearch = () => {
+        if (socket) {
+            socket.emit('search_friends', { userId: currentUser.id, query: searchTerm });
+        }
+    };
+
     const addFriend = useCallback(() => {
         if (!friendUsername.trim() || !friendTagName.trim() || !socket) {
             setAddFriendStatus({ message: 'Please enter both username and tag', type: 'error' });
@@ -499,7 +466,22 @@ const FriendsList = () => {
                         <UserPlus className="w-5 h-5 text-purple-400" />
                     </button>
                 </div>
-                <div className="flex items-center space-x-4 text-sm">
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="text"
+                        placeholder="Search friends..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="flex-1 bg-purple-700/50 text-white px-3 py-1.5 rounded-lg border border-purple-600 focus:outline-none focus:border-purple-500"
+                    />
+                    <button
+                        onClick={handleSearch}
+                        className="p-2 bg-purple-600 hover:bg-purple-700 rounded-lg"
+                    >
+                        <Search className="w-5 h-5 text-white" />
+                    </button>
+                </div>
+                <div className="flex items-center space-x-4 text-sm mt-2">
                     <span className="text-green-400 font-semibold">{onlineFriends.length} ONLINE</span>
                     <span className="text-purple-400">{offlineFriends.length} OFFLINE</span>
                 </div>

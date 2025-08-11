@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { IGitHubAuthService } from '../../types/interfaces/IGitHubAuthService';
 
-export class GitHubAuthService {
+export class GitHubAuthService implements IGitHubAuthService {
     async exchangeCode(code: string): Promise<any> {
         // Exchange code for access token
         const tokenResponse = await axios.post('https://github.com/login/oauth/access_token', {

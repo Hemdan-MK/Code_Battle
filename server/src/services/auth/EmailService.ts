@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
+import { IEmailService } from '../../types/interfaces/IEmailService';
 
-export class EmailService {
+export class EmailService implements IEmailService {
     private transporter: nodemailer.Transporter;
 
     constructor() {
