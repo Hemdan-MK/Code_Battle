@@ -1,6 +1,5 @@
 import mongoose, { model, Schema } from "mongoose";
 import { IUser } from "./interfaces/Index";
-import { number, string } from "zod";
 
 const userSchema = new Schema<IUser>({
     token: { type: String, required: false },
@@ -19,7 +18,7 @@ const userSchema = new Schema<IUser>({
         type: String,
         default: 'offline'
     },
-    rank: { type: String, default: 'Unranked' },
+    rank: { type: String, default: 'unranked' },
     level: { type: Number, default: 1 },
     xp: {
         type: Number,

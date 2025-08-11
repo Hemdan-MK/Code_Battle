@@ -10,7 +10,7 @@ export interface UserProfileResponse {
     tag: string;
     email: string;
     phone: number | null;
-    rank: 'Diamond' | 'Platinum' | 'Gold' | 'Silver' | 'Unranked';
+    rank: 'unranked' | 'iron' | 'bronze' | 'silver' | 'gold' | 'diamond';
     level?: number;
     xp: number;
     currentAvatar?: Types.ObjectId | null;

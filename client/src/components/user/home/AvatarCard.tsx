@@ -1,16 +1,8 @@
 import { Plus } from "lucide-react";
 
-const getRankImage = (rank) => {
-    const rankImages = {
-        'TOXIC': '/image/rank-toxic.png',
-        'HUNTSMAN': '/image/rank-huntsman.png',
-        'OLD DOG': '/image/rank-olddog.png',
-        'MASTER': '/image/rank-master.png',
-        'SILVER': '/image/rank-silver.png',
-        'GOLD': '/image/rank-gold.png',
-        'PLATINUM': '/image/rank-platinum.png',
-    };
-    return rankImages[rank] || '/image/default-rank.webp';
+const getRankImage = () => {
+    // Since the images for the new ranks do not exist, we will always use the default image.
+    return '/image/default-rank.webp';
 };
 
 const AvatarCard = ({
@@ -81,7 +73,7 @@ const AvatarCard = ({
                     {!showAddButton && (
                         <div className="absolute inset-1 rounded-sm flex items-center justify-center transform -rotate-45">
                             <img
-                                src={getRankImage(user.rank)}
+                                src={getRankImage()}
                                 alt={user.rank}
                                 className="w-full h-full object-contain"
                                 onError={(e) => {
