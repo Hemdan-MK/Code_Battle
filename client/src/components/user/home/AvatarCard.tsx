@@ -84,6 +84,10 @@ const AvatarCard = ({
                                 src={getRankImage(user.rank)}
                                 alt={user.rank}
                                 className="w-full h-full object-contain"
+                                onError={(e) => {
+                                    console.error("Failed to load rank image:", (e.target as HTMLImageElement).src);
+                                    (e.target as HTMLImageElement).src = '/image/rank-silver.png';
+                                }}
                             />
                         </div>
                     )}
