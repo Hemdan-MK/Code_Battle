@@ -27,7 +27,7 @@ const getStatusColor = (status) => {
 const FriendsList = () => {
     const dispatch = useDispatch();
     const messages = useSelector((state: RootState) => state.chat.individual);
-    const socket = useSocket();
+    const { socket } = useSocket();
 
     // State
     const [friends, setFriends] = useState([]);
@@ -514,7 +514,7 @@ const FriendsList = () => {
                                                         {friend.rank}
                                                     </span>
                                                 </div>
-                                                <p className="text-cyan-400 text-sm truncate">{friend.game}</p>
+                                                <p className="text-cyan-400 text-sm truncate">{friend.status}</p>
                                             </div>
                                             <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                                                 <button

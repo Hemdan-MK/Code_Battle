@@ -13,7 +13,7 @@ function AppContent() {
   const data = useSelector((state: RootState) => state);
   const dispatch = useDispatch();
   const { showToast } = useToast();
-  const socket = useSocket();
+  const { socket } = useSocket();
   const user = getUser();
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
 

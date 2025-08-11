@@ -3,7 +3,7 @@ import { Send, MessageCircle } from "lucide-react";
 import { useSocket } from "@/hooks/useSocket";
 
 const TeamChat = ({ team, currentUserId }) => {
-    const socket = useSocket();
+    const { socket } = useSocket();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
     const messagesEndRef = useRef(null);

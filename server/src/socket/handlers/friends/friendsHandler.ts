@@ -9,6 +9,37 @@ const isValidObjectId = (id: string): boolean => {
     return Types.ObjectId.isValid(id) && (String(new Types.ObjectId(id)) === id);
 };
 
+async function getFriends(userId: string, activeUsers: Map<string, IActiveUser>, query?: string) {
+    const user = await User.findById(userId)
+        .populate({
+            path: 'friends',
+            match: query ? { username: { $regex: query, $options: 'i' } } : {},
+            select: '_id username currentAvatar status currentGame rank lastSeen updatedAt'
+        })
+        .exec();
+
+    if (!user) {
+        throw new Error('User not found');
+    }
+
+    const friendsWithStatus = user.friends.map((friend: any) => {
+        const friendId = friend._id.toString();
+        const isOnline = activeUsers.has(friendId);
+
+        return {
+            id: friendId,
+            username: friend.username,
+            avatar: friend.currentAvatar,
+            status: isOnline ? 'online' : friend.status || 'offline',
+            game: friend.currentGame || (isOnline ? 'Online' : 'Offline'),
+            rank: friend.rank || 'UNRANKED',
+            lastSeen: friend.lastSeen || friend.updatedAt
+        };
+    });
+
+    return friendsWithStatus;
+}
+
 export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Map<string, IActiveUser>) => {
     
     socket.on('get_Details', async () => {
@@ -98,18 +129,7 @@ export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Ma
             });
 
             // Get friends with updated online status
-            const friendsWithStatus = user.friends.map((friend: any) => {
-                const isOnline = activeUsers.has(friend._id.toString());
-                return {
-                    id: friend._id.toString(),
-                    username: friend.username,
-                    avatar: friend.currentAvatar,
-                    status: isOnline ? 'online' : friend.status || 'offline',
-                    game: friend.currentGame || (isOnline ? 'Online' : 'Offline'),
-                    rank: friend.rank || 'UNRANKED',
-                    lastSeen: friend.lastSeen || friend.updatedAt
-                };
-            });
+            const friendsWithStatus = await getFriends(userId, activeUsers);
 
             // Send friends list to client
             socket.emit('friends_list', { friends: friendsWithStatus });
@@ -340,31 +360,7 @@ export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Ma
                 return;
             }
 
-            const user = await User.findById(userId)
-                .populate('friends', '_id username currentAvatar status currentGame rank lastSeen updatedAt')
-                .exec();
-
-            if (!user) {
-                socket.emit('friends_error', {
-                    message: 'User not found. Please log in again.'
-                });
-                return;
-            }
-
-            const friendsWithStatus = user.friends.map((friend: any) => {
-                const friendId = friend._id.toString();
-                const isOnline = activeUsers.has(friendId);
-
-                return {
-                    id: friendId,
-                    username: friend.username,
-                    avatar: friend.currentAvatar,
-                    status: isOnline ? 'online' : 'offline',
-                    game: friend.currentGame || (isOnline ? 'Online' : 'Offline'),
-                    rank: friend.rank || 'UNRANKED',
-                    lastSeen: friend.lastSeen || friend.updatedAt
-                };
-            });
+            const friendsWithStatus = await getFriends(userId, activeUsers);
 
             socket.emit('friends_list', { friends: friendsWithStatus });
 
@@ -383,32 +379,7 @@ export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Ma
                 return;
             }
 
-            const user = await User.findById(userId)
-                .populate({
-                    path: 'friends',
-                    match: { username: { $regex: query, $options: 'i' } }
-                })
-                .exec();
-
-            if (!user) {
-                socket.emit('friends_error', { message: 'User not found' });
-                return;
-            }
-
-            const friendsWithStatus = user.friends.map((friend: any) => {
-                const friendId = friend._id.toString();
-                const isOnline = activeUsers.has(friendId);
-
-                return {
-                    id: friendId,
-                    username: friend.username,
-                    avatar: friend.currentAvatar,
-                    status: isOnline ? 'online' : 'offline',
-                    game: friend.currentGame || (isOnline ? 'Online' : 'Offline'),
-                    rank: friend.rank || 'UNRANKED',
-                    lastSeen: friend.lastSeen || friend.updatedAt
-                };
-            });
+            const friendsWithStatus = await getFriends(userId, activeUsers, query);
 
             socket.emit('friends_list', { friends: friendsWithStatus });
         } catch (error) {
