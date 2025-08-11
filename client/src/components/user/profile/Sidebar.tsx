@@ -6,7 +6,7 @@ import { useSocket } from "@/hooks/useSocket";
 
 const Sidebar = ({ setActiveSection, activeSection }) => {
     const dispatch = useAppDispatch();
-    const socket = useSocket();
+    const { socket } = useSocket();
 
     const handleLogout = () => {
         const user = getUser();

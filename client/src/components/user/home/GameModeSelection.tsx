@@ -54,12 +54,10 @@ const GameModeSelection = () => {
     const [showInviteModal, setShowInviteModal] = useState(false);
     const [inviteData, setInviteData] = useState(null);
     const [friends, setFriends] = useState([]);
-    const [isConnected, setIsConnected] = useState(false);
-    const [connectionAttempts, setConnectionAttempts] = useState(0);
 
     const user = getUser();
     const currentUserId = user.id;
-    const socket = useSocket();
+    const { socket, isConnected } = useSocket();
     const { showToast } = useToast();
 
     // Initialize socket connection
@@ -68,27 +66,6 @@ const GameModeSelection = () => {
             console.error("No socket or user ID available");
             return;
         }
-
-        // Connection handlers
-        socket.on('connect', () => {
-            console.log("Connected to socket:", socket.id);
-            setIsConnected(true);
-            setConnectionAttempts(0);
-
-            // Request friends list on connect
-            socket.emit('get_friends_list', { userId: currentUserId });
-        });
-
-        socket.on('connect_error', (error) => {
-            console.error("Connection error:", error);
-            setIsConnected(false);
-            setConnectionAttempts(prev => prev + 1);
-        });
-
-        socket.on('disconnect', (reason) => {
-            console.log("Disconnected:", reason);
-            setIsConnected(false);
-        });
 
         // Auth handlers
         socket.on('auth_success', (data) => {
@@ -332,7 +309,7 @@ const GameModeSelection = () => {
                 {/* Connection Status */}
                 {!isConnected && (
                     <div className="bg-red-600 text-white px-4 py-2 rounded-lg">
-                        Connection lost... Attempting to reconnect ({connectionAttempts}/5)
+                        Connection lost... Reconnecting...
                     </div>
                 )}
 
