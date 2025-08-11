@@ -8,6 +8,7 @@ const username = getUser()?.username
 
 
 export const socket = io('http://localhost:3000', {
+    autoConnect: false,
     auth: {
         token,
         username

@@ -22,6 +22,7 @@ import {
     setAdmin,
     getTempToken,
 } from "@/utils/tokenUtils";
+import { connectSocket, disconnectSocket } from "@/socket";
 
 interface LoginData {
     email: string;
@@ -41,6 +42,7 @@ export const loginThunk = createAsyncThunk(
             // Store the token in localStorage/sessionStorage
             if (response.token) {
                 setToken(response.token);
+                connectSocket(response.token);
             }
 
             if (response.isAdmin) {
@@ -162,6 +164,7 @@ export const verifyOTPThunk = createAsyncThunk(
 
             setToken(response.token);
             setUser(response.user);
+            connectSocket(response.token);
 
             return response;
         } catch (error) {
@@ -186,6 +189,7 @@ export const googleAuthThunk = createAsyncThunk(
             const response = await googleAuthAPI(data);
 
             await setToken(response.token);
+            connectSocket(response.token);
 
             if (response.isAdmin) {
                 await setAdmin(response.user);
@@ -218,6 +222,7 @@ export const githubAuthThunk = createAsyncThunk(
             const response = await githubAuthAPI(data);
 
             await setToken(response.token);
+            connectSocket(response.token);
 
             if (response.isAdmin) {
                 await setAdmin(response.user);
@@ -247,7 +252,7 @@ export const logoutThunk = createAsyncThunk(
     "auth/logout",
     async (_, thunkAPI) => {
         try {
-            // await logoutAPI();
+            disconnectSocket();
             await logout()
 
             return null;
