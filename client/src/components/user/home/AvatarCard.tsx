@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 
 const getRankImage = () => {
     // Since the images for the new ranks do not exist, we will always use the default image.
@@ -11,11 +11,23 @@ const AvatarCard = ({
     showAddButton = false,
     onAdd = null,
     isReady = false,
-    onToggleReady = null
+    onToggleReady = null,
+    onKick = null,
+    isLeader = false
 }) => {
     return (
         <div className="relative group">
             <div className="bg-gradient-to-b from-purple-800/50 to-purple-900/50 backdrop-blur-sm border border-purple-600/50 rounded-t-3xl rounded-b-lg overflow-hidden">
+                {/* Kick Button for Leader */}
+                {isLeader && !isCurrentUser && onKick && (
+                    <button
+                        onClick={onKick}
+                        className="absolute top-2 right-2 z-10 p-1 bg-red-600/70 hover:bg-red-500 rounded-full transition-colors"
+                        title="Kick Member"
+                    >
+                        <X className="w-3 h-3 text-white" />
+                    </button>
+                )}
                 {/* Character Image */}
                 <div className="aspect-[3/4] bg-gradient-to-b from-purple-900/20 to-black/40 flex items-center justify-center relative">
                     {showAddButton ? (
