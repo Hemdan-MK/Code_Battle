@@ -18,7 +18,7 @@ const createUserSchema = z.object({
     phone: z.number()
         .int("Phone number must be an integer")
         .positive("Phone number must be positive"),
-    rank: z.enum(["Silver", "Gold", "Platinum", "Diamond", "Unranked"] as const),
+    rank: z.enum(['unranked', 'iron', 'bronze', 'silver', 'gold', 'diamond'] as const),
     xp: z.number()
         .int("XP must be an integer")
         .min(0, "XP cannot be negative"),
@@ -37,7 +37,7 @@ const updateUserSchema = z.object({
         .int("Phone number must be an integer")
         .positive("Phone number must be positive")
     ,
-    rank: z.enum(["Silver", "Gold", "Platinum", "Diamond", "Unranked"] as const),
+    rank: z.enum(['unranked', 'iron', 'bronze', 'silver', 'gold', 'diamond'] as const),
     xp: z.number()
         .int("XP must be an integer")
         .min(0, "XP cannot be negative"),
@@ -95,7 +95,7 @@ const UserManagement: React.FC = () => {
         username: '',
         email: '',
         phone: undefined,
-        rank: 'Silver',
+        rank: 'unranked',
         xp: 0,
         role: 'user'
     });
@@ -269,7 +269,7 @@ const UserManagement: React.FC = () => {
 
             // Close modal and reset form
             updateState({ showUpdateModal: false, selectedUser: null });
-            setUpdateForm({ username: '', email: '', phone: undefined, rank: 'Silver', xp: 0 });
+            setUpdateForm({ username: '', email: '', phone: undefined, rank: 'unranked', xp: 0, role: 'user' });
             setUpdateFormErrors({});
 
             // Refresh data
@@ -396,8 +396,8 @@ const UserManagement: React.FC = () => {
             selectedUser: null,
             error: ''
         });
-        setCreateForm({ username: '', email: '', password: '', phone: undefined });
-        setUpdateForm({ username: '', email: '', rank: 'Silver', xp: 0, phone: undefined });
+        setCreateForm({ username: '', email: '', password: '', phone: undefined, rank: 'unranked', xp: 0, role: 'user' });
+        setUpdateForm({ username: '', email: '', rank: 'unranked', xp: 0, phone: undefined, role: 'user' });
         setCreateFormErrors({});
         setUpdateFormErrors({});
     };
@@ -416,11 +416,12 @@ const UserManagement: React.FC = () => {
 
     const getRankColor = (rank: UserRank): string => {
         const colorMap: Record<UserRank, string> = {
-            Diamond: 'from-cyan-400 to-blue-500',
-            Platinum: 'from-gray-300 to-gray-500',
-            Gold: 'from-yellow-400 to-yellow-600',
-            Silver: 'from-gray-400 to-gray-600',
-            Unranked: 'from-orange-400 to-orange-600'
+            diamond: 'from-cyan-400 to-blue-500',
+            gold: 'from-yellow-400 to-yellow-600',
+            silver: 'from-gray-400 to-gray-600',
+            bronze: 'from-yellow-600 to-yellow-800',
+            iron: 'from-gray-500 to-gray-700',
+            unranked: 'from-orange-400 to-orange-600'
         };
         return colorMap[rank] || 'from-orange-400 to-orange-600';
     };
@@ -647,11 +648,12 @@ const UserManagement: React.FC = () => {
                                 className={`w-full px-3 py-2 bg-gray-700 border rounded-lg focus:ring-2 focus:ring-violet-500 text-white ${updateFormErrors.rank ? 'border-red-500' : 'border-gray-600'
                                     }`}
                             >
-                                <option value="Unranked">Unranked</option>
-                                <option value="Silver">Silver</option>
-                                <option value="Gold">Gold</option>
-                                <option value="Platinum">Platinum</option>
-                                <option value="Diamond">Diamond</option>
+                                <option value="unranked">Unranked</option>
+                                <option value="iron">Iron</option>
+                                <option value="bronze">Bronze</option>
+                                <option value="silver">Silver</option>
+                                <option value="gold">Gold</option>
+                                <option value="diamond">Diamond</option>
                             </select>
                             {updateFormErrors.rank && <p className="text-red-400 text-xs mt-1">{updateFormErrors.rank}</p>}
                         </div>
@@ -786,11 +788,12 @@ const UserManagement: React.FC = () => {
                                 className={`w-full px-3 py-2 bg-gray-700 border rounded-lg focus:ring-2 focus:ring-violet-500 text-white ${createFormErrors.rank ? 'border-red-500' : 'border-gray-600'
                                     }`}
                             >
-                                <option value="Unranked">Unranked</option>
-                                <option value="Silver">Silver</option>
-                                <option value="Gold">Gold</option>
-                                <option value="Platinum">Platinum</option>
-                                <option value="Diamond">Diamond</option>
+                                <option value="unranked">Unranked</option>
+                                <option value="iron">Iron</option>
+                                <option value="bronze">Bronze</option>
+                                <option value="silver">Silver</option>
+                                <option value="gold">Gold</option>
+                                <option value="diamond">Diamond</option>
                             </select>
                             {createFormErrors.rank && <p className="text-red-400 text-xs mt-1">{createFormErrors.rank}</p>}
                         </div>

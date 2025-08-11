@@ -102,7 +102,7 @@ export interface UpdateUser {
 
 
 export type UserStatus = 'online' | 'offline' | 'banned' | 'away' | 'in game';
-export type UserRank = 'Diamond' | 'Platinum' | 'Gold' | 'Silver' | 'Unranked';
+export type UserRank = 'unranked' | 'iron' | 'bronze' | 'silver' | 'gold' | 'diamond';
 
 export interface UserStats {
     total: number;
@@ -110,10 +110,11 @@ export interface UserStats {
     offline: number;
     banned: number;
     ranks: {
-        Diamond: number;
-        Platinum: number;
-        Gold: number;
-        Silver: number;
-        Unranked: number;
+        unranked: number;
+        iron: number;
+        bronze: number;
+        silver: number;
+        gold: number;
+        diamond: number;
     };
 }

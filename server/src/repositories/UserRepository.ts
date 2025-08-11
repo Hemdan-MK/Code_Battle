@@ -93,11 +93,12 @@ export class UserRepository implements IUserRepository {
       offline: 0,
       banned: 0,
       ranks: {
-        Diamond: 0,
-        Platinum: 0,
-        Gold: 0,
-        Silver: 0,
-        Unranked: 0
+        diamond: 0,
+        gold: 0,
+        silver: 0,
+        bronze: 0,
+        iron: 0,
+        unranked: 0
       }
     };
 

@@ -10,7 +10,7 @@ export interface DecodedToken {
 // ----------------
 
 export type UserStatus = 'online' | 'offline' | 'banned' | 'away' | 'in game';
-export type UserRank = 'Diamond' | 'Platinum' | 'Gold' | 'Silver' | 'Unranked';
+export type UserRank = 'unranked' | 'iron' | 'bronze' | 'silver' | 'gold' | 'diamond';
 
 export interface User {
     _id?: string;

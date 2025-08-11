@@ -15,7 +15,7 @@ export interface IUser extends Document {
     isPhoneVerified: boolean;
     isEmailVerified: boolean;
     status: 'online' | 'offline',
-    rank: 'Diamond' | 'Platinum' | 'Gold' | 'Silver' | 'Unranked',
+    rank: 'unranked' | 'iron' | 'bronze' | 'silver' | 'gold' | 'diamond',
     xp: number,
     level?: number;
     isBanned: boolean;
