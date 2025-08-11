@@ -1,61 +1,12 @@
-import { addError } from "@/redux/authSlice";
 import { logoutThunk } from "@/redux/thunk";
-import { getToken, getUser } from "@/utils/tokenUtils";
+import { getUser } from "@/utils/tokenUtils";
 import { Shield, Star, Trophy, User, LogOut } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { io } from "socket.io-client";
+import { useAppDispatch } from "@/redux/hooks";
+import { useSocket } from "@/hooks/useSocket";
 
 const Sidebar = ({ setActiveSection, activeSection }) => {
-    const dispatch = useDispatch();
-    const [socket, setSocket] = useState(null);
-    const SOCKET_URL = 'http://localhost:3000';
-
-    useEffect(() => {
-        const validateTokenAndConnect = async () => {
-            const token = getToken();
-            const user = getUser();
-
-            if (!token) {
-                dispatch(addError('No authentication token found. Please log in again.'));
-                return;
-            }
-
-            try {
-                const newSocket = io(SOCKET_URL, {
-                    auth: {
-                        token,
-                        username: user.username
-                    }
-                });
-
-                // Store socket reference
-                setSocket(newSocket);
-
-                // Handle logout confirmation from server
-                newSocket.on('logout_confirmed', () => {
-                    console.log('Logout confirmed by server');
-                });
-
-                // Handle logout errors
-                newSocket.on('logout_error', (data) => {
-                    console.error('Logout error:', data.message);
-                    dispatch(addError(data.message));
-                });
-
-                newSocket.on('update_status', handleLogout);
-
-                return () => {
-                    newSocket.disconnect();
-                };
-            } catch (error) {
-                console.error('Socket connection error:', error);
-                dispatch(addError('Failed to connect to server. Please try again.'));
-            }
-        };
-
-        validateTokenAndConnect();
-    }, [dispatch]);
+    const dispatch = useAppDispatch();
+    const socket = useSocket();
 
     const handleLogout = () => {
         const user = getUser();

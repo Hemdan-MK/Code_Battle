@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useAppDispatch } from '../../redux/hooks';
 import { githubAuthThunk } from '../../redux/thunk';
+import { unwrapResult } from '@reduxjs/toolkit';
 
 const GitHubCallback: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const [searchParams] = useSearchParams();
 
     useEffect(() => {
@@ -27,7 +28,8 @@ const GitHubCallback: React.FC = () => {
 
                 console.log("hihi");
                 
-                const result = await dispatch(githubAuthThunk({ code }));
+                const resultAction = await dispatch(githubAuthThunk({ code }));
+                const result = unwrapResult(resultAction);
 
                 console.log('GitHub login successful:', result);
 

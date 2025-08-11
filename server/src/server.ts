@@ -9,12 +9,11 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
 
 import connectDB from './config/database';
 import limiter from './middleware/rateLimitter';
 import errorHandler from './middleware/errorHandler';
-import { setupSocketHandlers } from './socket/socketManager';
+import { initSocket } from './socket';
 
 // Routes
 import test from './routes/testRoute';
@@ -24,13 +23,7 @@ import profileRouter from './routes/user/profileRoutes'
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:5173",
-        methods: ["GET", "POST"],
-        credentials: true
-    }
-});
+const io = initSocket(server);
 
 const PORT = process.env.PORT || 3000;
 
@@ -47,9 +40,6 @@ app.use(test);
 app.use('/auth', authRoutes);
 app.use('/admin', adminRouter);
 app.use('/user', profileRouter);
-
-// Setup Socket.IO handlers
-setupSocketHandlers(io);
 
 // Error handling
 app.use(errorHandler);

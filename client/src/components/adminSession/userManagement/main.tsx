@@ -442,6 +442,7 @@ const UserManagement: React.FC = () => {
                 {label} {required && <span className="text-red-400">*</span>}
             </label>
             <input
+                name={name}
                 type={type}
                 value={value ?? ''}
                 onChange={(e) => {

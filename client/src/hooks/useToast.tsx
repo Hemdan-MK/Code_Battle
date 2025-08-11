@@ -75,16 +75,16 @@ export const useToast = () => {
 
 // Utility functions for easier usage
 export const toast = {
-    success: (message: string, options?: { duration?: number; title?: string }) => {
+    success: () => {
         // This will be set up in your main app
     },
-    error: (message: string, options?: { duration?: number; title?: string }) => {
+    error: () => {
         // This will be set up in your main app
     },
-    info: (message: string, options?: { duration?: number; title?: string }) => {
+    info: () => {
         // This will be set up in your main app
     },
-    warning: (message: string, options?: { duration?: number; title?: string }) => {
+    warning: () => {
         // This will be set up in your main app
     }
 };

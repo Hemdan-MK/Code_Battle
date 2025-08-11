@@ -1,10 +1,8 @@
-import React from 'react';
 import {
   Users,
   Trophy,
   Settings,
   FileText,
-  Shield,
   BarChart3,
   MessageSquare,
   ShoppingCart,

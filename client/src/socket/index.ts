@@ -1,7 +1,6 @@
 // utils/socket.js
 import { io } from 'socket.io-client';
-import { getToken, getUser } from './tokenUtils';
-const SOCKET_URL = 'http://localhost:3000';
+import { getToken, getUser } from '../utils/tokenUtils';
 
 // Initialize socket connection
 const token = getToken();

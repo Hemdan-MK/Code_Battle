@@ -1,8 +1,8 @@
 // socket/auth/authHandler.ts
 import { Server } from 'socket.io';
 import jwt from 'jsonwebtoken';
-import User from '../../models/User';
-import { IUser } from '../../models/interfaces/Index';
+import User from '../../../models/User';
+import { IUser } from '../../../models/interfaces/Index';
 
 interface JwtPayload {
     userId: string;

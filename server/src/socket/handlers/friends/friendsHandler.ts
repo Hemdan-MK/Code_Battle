@@ -2,8 +2,8 @@
 import { Socket, Server } from 'socket.io';
 import { Types } from 'mongoose';
 import mongoose from 'mongoose';
-import User from '../../models/User';
-import { IActiveUser } from '../store/userStore';
+import User from '../../../models/User';
+import { IActiveUser } from '../../store/userStore';
 
 const isValidObjectId = (id: string): boolean => {
     return Types.ObjectId.isValid(id) && (String(new Types.ObjectId(id)) === id);

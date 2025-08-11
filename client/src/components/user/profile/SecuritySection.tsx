@@ -1,6 +1,6 @@
 import { addError } from "@/redux/authSlice";
 import { getDetailsAPI, updatePassword, updateUsername } from "@/services/user/getDetailsService";
-import { Eye, EyeOff, Shield, User, Tag, Loader2, Check, X } from "lucide-react";
+import { Eye, EyeOff, Shield, User, Loader2, Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { z } from "zod";
@@ -93,7 +93,7 @@ const SecuritySection = () => {
 
         try {
             // Validate form data
-            const validatedData = passwordSchema.parse(passwordForm);
+            passwordSchema.parse(passwordForm);
 
             // Make API call and wait for response
             const response = await updatePassword(
@@ -153,7 +153,7 @@ const SecuritySection = () => {
 
         try {
             // Validate form data
-            const validatedData = userSchema.parse({ username, tagName });
+            userSchema.parse({ username, tagName });
 
             await updateUsername(username, tagName);
             setUserUpdateSuccess(true);

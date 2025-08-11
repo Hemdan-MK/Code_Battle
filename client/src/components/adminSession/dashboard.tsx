@@ -1,18 +1,9 @@
-import React, { useState } from 'react';
 import {
     Users,
-    Trophy,
-    Settings,
     FileText,
     Shield,
     BarChart3,
-    MessageSquare,
-    ShoppingCart,
-    AlertTriangle,
-    Menu,
-    X,
-    Bell,
-    Gamepad2
+    AlertTriangle
 } from 'lucide-react';
 
 

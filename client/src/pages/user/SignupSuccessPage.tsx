@@ -6,7 +6,6 @@ import {
   Trophy,
   Sword,
   Crown,
-  Zap,
   Users,
   Target,
   ArrowRight,
@@ -24,7 +23,7 @@ const SignUpSuccessPage: React.FC = () => {
   const location = useLocation();
   
   // Get user data from previous page - corrected to match the state structure
-  const { username, email, message, isSignupComplete } = location.state || {};
+  const { username, message } = location.state || {};
   const displayUsername = username || 'Warrior';
 
   useEffect(() => {
