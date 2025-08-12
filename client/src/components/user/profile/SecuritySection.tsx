@@ -6,15 +6,16 @@ import { useDispatch } from "react-redux";
 import { z } from "zod";
 
 const SecuritySection = () => {
+    const [isLoading, setIsLoading] = useState(true);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [username, setUsername] = useState(null);
-    const [tagName, setTagName] = useState(null);
+    const [username, setUsername] = useState('');
+    const [tagName, setTagName] = useState('');
 
     // Store original values for comparison
-    const [originalUsername, setOriginalUsername] = useState(null);
-    const [originalTagName, setOriginalTagName] = useState(null);
+    const [originalUsername, setOriginalUsername] = useState('');
+    const [originalTagName, setOriginalTagName] = useState('');
 
     // Loading, success, and failure states
     const [userUpdateLoading, setUserUpdateLoading] = useState(false);
@@ -56,19 +57,23 @@ const SecuritySection = () => {
 
     useEffect(() => {
         const getDetails = async () => {
+            setIsLoading(true);
             try {
                 const result = await getDetailsAPI();
-                setUsername(result.username);
-                setTagName(result.tag);
-                setOriginalUsername(result.username);
-                setOriginalTagName(result.tag);
-
+                if (result) {
+                    setUsername(result.username);
+                    setTagName(result.tag);
+                    setOriginalUsername(result.username);
+                    setOriginalTagName(result.tag);
+                }
             } catch (error) {
                 if (error instanceof Error) {
                     dispatch(addError(error.message));
                 } else {
-                    dispatch(addError('An unknown error occurred'));
+                    dispatch(addError('An unknown error occurred while fetching profile details.'));
                 }
+            } finally {
+                setIsLoading(false);
             }
         }
 
@@ -134,7 +139,7 @@ const SecuritySection = () => {
                 // Handle validation errors
                 setPasswordErrors(error.errors.map(err => err.message));
             } else {
-                dispatch(addError(error));
+                dispatch(addError(error.message || 'An unknown error occurred'));
             }
             setPasswordUpdateFailed(true);
 
@@ -176,7 +181,7 @@ const SecuritySection = () => {
                 setUserErrors(error.errors.map(err => err.message));
             } else {
                 // Handle API errors
-                dispatch(addError(error));
+                dispatch(addError(error.message || 'An unknown error occurred'));
             }
             setUserUpdateFailed(true);
 
@@ -188,6 +193,15 @@ const SecuritySection = () => {
             setUserUpdateLoading(false);
         }
     };
+
+    if (isLoading) {
+        return (
+            <div className="pt-20 flex justify-center items-center">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-400" />
+                <span className="ml-4 text-white text-lg">Loading profile...</span>
+            </div>
+        );
+    }
 
     return (
         <div className="pt-20 space-y-6">
