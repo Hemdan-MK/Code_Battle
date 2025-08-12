@@ -9,6 +9,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { createServer } from 'http';
+import cookieParser from 'cookie-parser';
 
 import connectDB from './config/database';
 import limiter from './middleware/rateLimitter';
@@ -29,7 +30,11 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    credentials: true
+}) as any);
+app.use(cookieParser() as any);
 // app.use(morgan('combined'));
 app.use(limiter);
 app.use(express.json({ limit: '10mb' }));

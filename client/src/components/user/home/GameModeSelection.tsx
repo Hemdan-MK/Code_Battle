@@ -13,10 +13,9 @@ const gameTypes = [
     { id: 'team3v3', name: 'Team 3v3', description: '3v3 team battles' },
 ];
 
-const TeamSelection = ({ team, onInviteFriend, onToggleReady, currentUserId }) => {
+const TeamSelection = ({ team, onInviteFriend, onToggleReady, currentUserId, onKick, isLeader }) => {
     const maxTeamSize = 3;
     const emptySlots = maxTeamSize - (team?.members?.length || 0);
-    const isLeader = team?.leader === currentUserId;
 
     return (
         <div className="flex justify-center space-x-6">
@@ -31,6 +30,8 @@ const TeamSelection = ({ team, onInviteFriend, onToggleReady, currentUserId }) =
                     isCurrentUser={member.userId === currentUserId}
                     isReady={member.ready}
                     onToggleReady={member.userId === currentUserId ? onToggleReady : null}
+                    onKick={isLeader && member.userId !== currentUserId ? () => onKick(member.userId) : null}
+                    isLeader={isLeader}
                 />
             ))}
 
@@ -91,16 +92,25 @@ const GameModeSelection = () => {
         socket.on('team_created', (data) => {
             console.log("Team created:", data.team);
             setTeam(data.team);
+            showToast('Team created successfully!', 'success');
         });
 
         socket.on('team_member_joined', (data) => {
             console.log("Team member joined:", data);
             setTeam(data.team);
+            showToast(`${data.member.username} has joined the team.`, 'info');
         });
 
         socket.on('team_member_left', (data) => {
             console.log("Team member left:", data);
             setTeam(data.team);
+            showToast(`A member has left the team.`, 'info');
+        });
+
+        socket.on('team_member_kicked', (data) => {
+            console.log("Team member kicked:", data);
+            setTeam(data.team);
+            showToast(`A member has been kicked from the team.`, 'warning');
         });
 
         socket.on('team_left', () => {
@@ -248,6 +258,12 @@ const GameModeSelection = () => {
         }
     };
 
+    const handleKickMember = (memberId: string) => {
+        if (socket && team && team.leader === currentUserId) {
+            socket.emit('kick_team_member', { teamId: team.id, memberId });
+        }
+    };
+
     const handleToggleReady = () => {
         if (!socket || !isConnected) {
             console.error("Socket not connected");
@@ -326,24 +342,38 @@ const GameModeSelection = () => {
                     <div>Team: {team ? `${team.members.length} members` : 'None'}</div>
                 </div> */}
 
-                {/* Game Mode Selection */}
-                <div className="flex space-x-8">
-                    {gameTypes.map((type) => (
-                        <button
-                            key={type.id}
-                            onClick={() => handleModeChange(type.id)}
-                            className={`pb-4 px-6 text-lg font-bold transition-all duration-300 border-b-2 ${selectedMode === type.id
-                                ? 'text-cyan-400 border-cyan-400'
-                                : 'text-purple-400 border-transparent hover:text-white'
-                                }`}
-                        >
-                            {type.name.toUpperCase()}
-                        </button>
-                    ))}
-                </div>
+                {/* Game Mode Selection or Team Session */}
+                {isInTeam ? (
+                    <div className="w-full">
+                        <h2 className="text-3xl font-bold text-center mb-6 text-cyan-400">Team Session</h2>
+                        <TeamSelection
+                            team={team}
+                            onInviteFriend={handleInviteFriend}
+                            onToggleReady={handleToggleReady}
+                            currentUserId={currentUserId}
+                            onKick={handleKickMember}
+                            isLeader={team.leader === currentUserId}
+                        />
+                    </div>
+                ) : (
+                    <div className="flex space-x-8">
+                        {gameTypes.map((type) => (
+                            <button
+                                key={type.id}
+                                onClick={() => handleModeChange(type.id)}
+                                className={`pb-4 px-6 text-lg font-bold transition-all duration-300 border-b-2 ${selectedMode === type.id
+                                    ? 'text-cyan-400 border-cyan-400'
+                                    : 'text-purple-400 border-transparent hover:text-white'
+                                    }`}
+                            >
+                                {type.name.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
+                )}
 
                 {/* Team/Solo Display */}
-                {selectedMode === 'solo' ? (
+                {!isInTeam && selectedMode === 'solo' && (
                     <div className="flex justify-center">
                         <AvatarCard
                             user={{
@@ -355,41 +385,32 @@ const GameModeSelection = () => {
                             isReady={true}
                         />
                     </div>
-                ) : (
-                    <>
-                        {isInTeam ? (
-                            <TeamSelection
-                                team={team}
-                                onInviteFriend={handleInviteFriend}
-                                onToggleReady={handleToggleReady}
-                                currentUserId={currentUserId}
-                            />
-                        ) : (
-                            <div className="flex flex-col items-center space-y-4">
-                                <div className="text-purple-400 text-lg">
-                                    You are not in a team. Create one to start playing with friends.
-                                </div>
-                                <button
-                                    onClick={createTeam}
-                                    disabled={!isConnected}
-                                    className={`px-8 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${isConnected
-                                        ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                                        : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                                        }`}
-                                >
-                                    <Users className="w-5 h-5" />
-                                    <span>Create Team</span>
-                                </button>
-                            </div>
-                        )}
-                    </>
+                )}
+
+                {!isInTeam && selectedMode === 'team3v3' && (
+                    <div className="flex flex-col items-center space-y-4">
+                        <div className="text-purple-400 text-lg">
+                            You are not in a team. Create one to start playing with friends.
+                        </div>
+                        <button
+                            onClick={createTeam}
+                            disabled={!isConnected}
+                            className={`px-8 py-3 rounded-lg font-semibold transition-colors flex items-center space-x-2 ${isConnected
+                                ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                                : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                                }`}
+                        >
+                            <Users className="w-5 h-5" />
+                            <span>Create Team</span>
+                        </button>
+                    </div>
                 )}
 
                 {/* Action Buttons */}
                 <div className="flex space-x-6 items-center">
                     <button
                         onClick={handleStart}
-                        disabled={!canStart || !isConnected}
+                        disabled={!canStart || !isConnected || (isInTeam && selectedMode === 'solo')}
                         className={`px-12 py-4 rounded-lg font-bold text-xl transition-all duration-300 ${isStarted
                             ? 'bg-red-600 hover:bg-red-700 text-white'
                             : canStart && isConnected

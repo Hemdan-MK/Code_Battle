@@ -366,4 +366,51 @@ export const setupTeamHandlers = (socket: Socket, io: Server, activeUsers: Map<s
             currentUserId: socket.userId
         });
     });
+
+    socket.on('kick_team_member', async (data) => {
+        try {
+            const { teamId, memberId } = data;
+            const leaderId = socket.userId;
+
+            if (!leaderId) {
+                socket.emit('team_error', { message: 'Unauthorized request' });
+                return;
+            }
+
+            const team = activeTeams.get(teamId);
+            if (!team) {
+                socket.emit('team_error', { message: 'Team not found' });
+                return;
+            }
+
+            if (team.leader !== leaderId) {
+                socket.emit('team_error', { message: 'Only the team leader can kick members' });
+                return;
+            }
+
+            const memberToKick = team.members.find((m: { userId: any; }) => m.userId === memberId);
+            if (!memberToKick) {
+                socket.emit('team_error', { message: 'Member not found in team' });
+                return;
+            }
+
+            team.members = team.members.filter((m: { userId: any; }) => m.userId !== memberId);
+            userTeams.delete(memberId);
+
+            io.to(teamId).emit('team_member_kicked', {
+                kickedUserId: memberId,
+                kickedBy: leaderId,
+                team
+            });
+
+            const kickedUserSocket = activeUsers.get(memberId)?.socketId;
+            if (kickedUserSocket) {
+                io.sockets.sockets.get(kickedUserSocket)?.leave(teamId);
+            }
+
+        } catch (error) {
+            console.error('Error kicking team member:', error);
+            socket.emit('team_error', { message: 'Failed to kick member' });
+        }
+    });
 }

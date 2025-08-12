@@ -79,6 +79,7 @@ export class AuthService implements IAuthService {
             success: true,
             message: 'Login successful',
             token,
+            refreshToken,
             user: {
                 id: user._id,
                 email: user.email,
@@ -182,6 +183,7 @@ export class AuthService implements IAuthService {
             success: true,
             message: 'OTP verified successfully',
             token,
+            refreshToken,
             user: {
                 id: user._id,
                 email: user.email,
@@ -208,9 +210,7 @@ export class AuthService implements IAuthService {
         };
     }
 
-    async googleAuth({ access_token, id_token }: GoogleAuthRequest): Promise<{
-        success: boolean; message: string; token: string; user: any; isAdmin: boolean;
-    }> {
+    async googleAuth({ access_token, id_token }: GoogleAuthRequest): Promise<AuthResponse> {
 
         const { data: googleUser } = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
             headers: {
@@ -263,6 +263,7 @@ export class AuthService implements IAuthService {
             success: true,
             message: 'Google authentication successful',
             token,
+            refreshToken,
             user: {
                 id: user._id,
                 email: user.email,
@@ -274,7 +275,7 @@ export class AuthService implements IAuthService {
         };
     }
 
-    async githubAuth(data: GitHubAuthRequest): Promise<{ success: boolean; message: string; token: string; user: any; isAdmin?: boolean }> {
+    async githubAuth(data: GitHubAuthRequest): Promise<AuthResponse> {
         const { code } = data;
 
         // Exchange code for access token and get user info
@@ -339,6 +340,7 @@ export class AuthService implements IAuthService {
             success: true,
             message: 'GitHub authentication successful',
             token,
+            refreshToken,
             user: {
                 id: user._id,
                 email: user.email,
@@ -442,6 +444,22 @@ export class AuthService implements IAuthService {
             message: 'OTP verified successfully',
             isCorrect: true
         };
+    }
+
+    async refreshToken(token: string): Promise<{ success: boolean; token: string; }> {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as RefreshTokenPayload;
+            const userId = decoded.userId;
+
+            const newAccessToken = this.tokenService.generateAccessToken(userId.toString());
+
+            return {
+                success: true,
+                token: newAccessToken
+            };
+        } catch (error) {
+            throw new Error('Invalid refresh token');
+        }
     }
 
     async resetNewPassword(password: string, tempToken: string): Promise<{
