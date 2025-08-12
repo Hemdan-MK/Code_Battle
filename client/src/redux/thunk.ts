@@ -1,5 +1,6 @@
 // redux/thunk.ts
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from 'axios';
 
 import {
     loginAPI,
@@ -52,29 +53,18 @@ export const loginThunk = createAsyncThunk(
             }
 
             return response;
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Login thunk error:', error);
 
             // Remove any existing tokens on login failure
             removeToken();
 
             let errorMessage = "Login failed. Please try again.";
-
-            // Handle different types of errors
-            // if (error?.response?.data?.message) {
-            //     errorMessage = error.response.data.message;
-            // } else if (error?.message) {
-            //     errorMessage = error.message;
-            // } else if (typeof error === 'string') {
-            //     errorMessage = error;
-            // }
-
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message as string;
+            } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -106,14 +96,13 @@ export const signupThunk = createAsyncThunk(
                 ...response,
                 requiresOTP: true,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             removeToken();
 
             let errorMessage = "Signup failed. Please try again.";
-
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message as string;
+            } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
 
@@ -130,14 +119,13 @@ export const resendOTPThunk = createAsyncThunk(
             const tempToken = await getTempToken()
             const response = await resendOTPAPI({ tempToken });
             return response;
-        } catch (error) {
+        } catch (error: unknown) {
             let errorMessage = "Failed to resend OTP. Please try again.";
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message as string;
+            } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -167,15 +155,14 @@ export const verifyOTPThunk = createAsyncThunk(
             connectSocket(response.token);
 
             return response;
-        } catch (error) {
+        } catch (error: unknown) {
             let errorMessage = "OTP verification failed. Please try again.";
 
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message as string;
+            } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -198,17 +185,16 @@ export const googleAuthThunk = createAsyncThunk(
             }
 
             return response;
-        } catch (error) {
+        } catch (error: unknown) {
             removeToken();
 
             let errorMessage = "Google authentication failed. Please try again.";
 
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message as string;
+            } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -231,17 +217,16 @@ export const githubAuthThunk = createAsyncThunk(
             }
 
             return response;
-        } catch (error) {
+        } catch (error: unknown) {
             removeToken();
 
             let errorMessage = "GitHub authentication failed. Please try again.";
 
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message as string;
+            } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-
 
             return thunkAPI.rejectWithValue(errorMessage);
         }
@@ -256,17 +241,16 @@ export const logoutThunk = createAsyncThunk(
             await logout()
 
             return null;
-        } catch (error) {
+        } catch (error: unknown) {
             removeToken();
 
             let errorMessage = "Logout failed";
 
-            if (error.response && error.response.data && error.response.data.message) {
-                errorMessage = error.response.data.message;
-            } else if (error.message) {
+            if (axios.isAxiosError(error) && error.response?.data?.message) {
+                errorMessage = error.response.data.message as string;
+            } else if (error instanceof Error) {
                 errorMessage = error.message;
             }
-
 
             return thunkAPI.rejectWithValue(errorMessage);
         }

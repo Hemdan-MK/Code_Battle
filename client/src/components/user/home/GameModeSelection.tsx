@@ -172,7 +172,7 @@ const GameModeSelection = () => {
             console.log("Cleaning up socket connection");
             socket.off(); // Remove all listeners
         };
-    }, [currentUserId, socket, showInviteModal, inviteData]);
+    }, [currentUserId, socket, showInviteModal, inviteData, showToast]);
 
     // ADD USEEFFECT TO MONITOR STATE CHANGES
     useEffect(() => {

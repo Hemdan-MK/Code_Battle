@@ -40,16 +40,21 @@ const GitHubCallback: React.FC = () => {
                     navigate('/home', { replace: true });
                 }
 
-            } catch (error: any) {
+            } catch (error: unknown) {
                 console.error('GitHub callback error:', error);
-                setError(error.message || 'GitHub authentication failed');
+                let errorMessage = 'GitHub authentication failed';
+                if (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string') {
+                    errorMessage = error.message;
+                }
+                setError(errorMessage);
+
 
                 // Redirect to login page with error after 3 seconds
                 setTimeout(() => {
                     navigate('/login', {
                         replace: true,
                         state: {
-                            error: error.message || 'GitHub authentication failed'
+                            error: errorMessage
                         }
                     });
                 }, 3000);

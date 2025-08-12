@@ -1,7 +1,7 @@
 // App.tsx
 import { useSelector, useDispatch } from 'react-redux';
 import AppRouter from './router/Router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { clearError } from './redux/authSlice';
 import { type RootState } from './redux/store';
 import { ToastProvider, useToast } from './hooks/useToast';
@@ -17,7 +17,7 @@ function AppContent() {
   const user = getUser();
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
 
-  const handleActivity = () => {
+  const handleActivity = useCallback(() => {
     if (socket && user) {
       socket.emit('update_status', { userId: user.id, status: 'online' });
     }
@@ -29,7 +29,7 @@ function AppContent() {
         socket.emit('update_status', { userId: user.id, status: 'away' });
       }
     }, 5 * 60 * 1000); // 5 minutes
-  };
+  }, [socket, user]);
 
   useEffect(() => {
     window.addEventListener('mousemove', handleActivity);
@@ -43,7 +43,7 @@ function AppContent() {
         clearTimeout(inactivityTimer.current);
       }
     };
-  }, [socket, user]);
+  }, [handleActivity]);
 
   useEffect(() => {
     console.log('Redux Store: -> ');

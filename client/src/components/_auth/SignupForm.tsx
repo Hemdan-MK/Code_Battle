@@ -132,7 +132,7 @@ const SignUpForm: React.FC<SignUpFormProps> = () => {
                     });
                 }, 1500);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('SignUp error:', error);
                      
             // Clear any general errors from form

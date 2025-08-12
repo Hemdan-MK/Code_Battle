@@ -412,7 +412,7 @@ const UserManagement: React.FC = () => {
                 clearTimeout(searchTimeoutRef.current);
             }
         };
-    }, []);
+    }, [fetchUsers]);
 
     const getRankColor = (rank: UserRank): string => {
         const colorMap: Record<UserRank, string> = {

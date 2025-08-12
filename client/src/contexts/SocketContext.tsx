@@ -1,16 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { Socket } from 'socket.io-client';
+import React, { useState, useEffect } from 'react';
 import { socket } from '../socket';
-
-interface ISocketContext {
-    socket: Socket;
-    isConnected: boolean;
-}
-
-export const SocketContext = createContext<ISocketContext>({
-    socket,
-    isConnected: false,
-});
+import { SocketContext } from './socketDefinition';
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isConnected, setIsConnected] = useState(socket.connected);
