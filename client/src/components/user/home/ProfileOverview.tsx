@@ -78,24 +78,40 @@ const ProfileOverview = () => {
     };
 
     useEffect(() => {
-        if (socket && isConnected) {
-            socket.emit('get_Details');
+        // Define handlers to ensure stable function references for listeners
+        const handleDetailResponse = (data: { user: User }) => {
+            setUser(data.user);
+            setIsLoading(false);
+        };
+        const handleError = (error: { message: string }) => {
+            console.error('Socket error in ProfileOverview:', error);
+            setIsLoading(false);
+        };
+        const handleConnectError = (error: { message: string }) => {
+            console.error('Connection error in ProfileOverview:', error);
+            setIsLoading(false);
+        };
 
-            socket.on('detail_resp', (data: { user: User }) => {
-                setUser(data.user);
-                setIsLoading(false);
-            });
+        if (socket) {
+            // Set up listeners
+            socket.on('detail_resp', handleDetailResponse);
+            socket.on('error', handleError);
+            socket.on('connect_error', handleConnectError);
 
-            socket.on('error', (error: { message: string }) => {
-                console.error('Socket error:', error);
-                setIsLoading(false);
-            });
-
-            socket.on('connect_error', (error: { message: string }) => {
-                console.error('Connection error:', error);
-                setIsLoading(false);
-            });
+            // Request data if we are already connected
+            if (isConnected) {
+                socket.emit('get_Details');
+            }
         }
+
+        // Cleanup function to remove listeners on component unmount or re-render
+        return () => {
+            if (socket) {
+                socket.off('detail_resp', handleDetailResponse);
+                socket.off('error', handleError);
+                socket.off('connect_error', handleConnectError);
+            }
+        };
     }, [socket, isConnected]);
 
     if (isLoading) {
