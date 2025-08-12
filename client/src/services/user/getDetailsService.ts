@@ -34,6 +34,7 @@ export const getDetailsAPI = async (): Promise<ProfileResponse> => {
         return response.data;
     } catch (error) {
         console.error("get details failed:", error);
+        throw error;
     }
 };
 
