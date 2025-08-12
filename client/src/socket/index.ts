@@ -3,15 +3,13 @@ import { io } from 'socket.io-client';
 import { getToken, getUser } from '../utils/tokenUtils';
 
 // Initialize socket connection
-const token = getToken();
-const username = getUser()?.username
-
-
 export const socket = io('http://localhost:3000', {
     autoConnect: false,
-    auth: {
-        token,
-        username
+    auth: (cb) => {
+        cb({
+            token: getToken(),
+            username: getUser()?.username
+        });
     }
 });
 
