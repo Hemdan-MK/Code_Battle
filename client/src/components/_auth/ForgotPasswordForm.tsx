@@ -11,6 +11,7 @@ import {
   ArrowLeft,
   Send,
 } from 'lucide-react';
+import axios from 'axios';
 
 // Zod schema for email validation
 const emailSchema = z.object({
@@ -50,17 +51,21 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setShowNoUserMo
     try {
       const response = await forgotPasswordAPI({ email });
       return response;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Server request failed:', error);
 
-      // Handle different types of errors
-      if (error.response?.data?.message) {
-        throw new Error(error.response.data.message);
-      } else if (error.message) {
-        throw new Error(error.message);
-      } else {
-        throw new Error('Failed to connect to server');
+      if (axios.isAxiosError(error)) {
+        const message = (error.response?.data as { message?: string })?.message;
+        if (message) {
+          throw new Error(message);
+        }
       }
+
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+
+      throw new Error('Failed to connect to server or an unexpected error occurred');
     }
   };
 
@@ -105,9 +110,13 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setShowNoUserMo
       } else {
         setError(response.message || 'Failed to send reset code');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Forgot password error:', error);
-      setError(error.message || 'Something went wrong. Please try again.');
+      if (error instanceof Error) {
+        setError(error.message || 'Something went wrong. Please try again.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

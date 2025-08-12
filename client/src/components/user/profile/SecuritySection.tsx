@@ -64,12 +64,16 @@ const SecuritySection = () => {
                 setOriginalTagName(result.tag);
 
             } catch (error) {
-                dispatch(addError(error))
+                if (error instanceof Error) {
+                    dispatch(addError(error.message));
+                } else {
+                    dispatch(addError('An unknown error occurred'));
+                }
             }
         }
 
         getDetails()
-    }, [])
+    }, [dispatch])
 
     const [passwordForm, setPasswordForm] = useState({
         currentPassword: '',

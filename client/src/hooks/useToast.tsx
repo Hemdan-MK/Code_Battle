@@ -1,22 +1,7 @@
 // hooks/useToast.tsx
-import React, { createContext, useContext, useState, type ReactNode } from 'react';
+import React, { useState, type ReactNode } from 'react';
 import CustomToast from '../components/common/CustomToast';
-
-interface ToastData {
-    id: string;
-    message: string;
-    type: 'success' | 'error' | 'info' | 'warning';
-    duration?: number;
-    title?: string;
-}
-
-interface ToastContextType {
-    showToast: (message: string, type: ToastData['type'], options?: { duration?: number; title?: string }) => void;
-    hideToast: (id: string) => void;
-    hideAllToasts: () => void;
-}
-
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+import { ToastContext, type ToastData } from './useToastDefinition';
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [toasts, setToasts] = useState<ToastData[]>([]);
@@ -63,28 +48,4 @@ export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             ))}
         </ToastContext.Provider>
     );
-};
-
-export const useToast = () => {
-    const context = useContext(ToastContext);
-    if (context === undefined) {
-        throw new Error('useToast must be used within a ToastProvider');
-    }
-    return context;
-};
-
-// Utility functions for easier usage
-export const toast = {
-    success: () => {
-        // This will be set up in your main app
-    },
-    error: () => {
-        // This will be set up in your main app
-    },
-    info: () => {
-        // This will be set up in your main app
-    },
-    warning: () => {
-        // This will be set up in your main app
-    }
 };

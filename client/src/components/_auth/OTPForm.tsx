@@ -90,7 +90,7 @@ const VerifyOTPPage: React.FC = () => {
 
         // Handle enter key
         if (e.key === 'Enter') {
-            handleSubmit(e as any);
+            handleSubmit(e);
         }
     };
 
@@ -114,7 +114,7 @@ const VerifyOTPPage: React.FC = () => {
         }
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent | React.KeyboardEvent) => {
         e.preventDefault();
 
         const otpString = otp.join('');
