@@ -4,7 +4,8 @@ import AppRouter from './router/Router';
 import { useEffect, useRef, useCallback } from 'react';
 import { clearError } from './redux/authSlice';
 import { type RootState } from './redux/store';
-import { ToastProvider, useToast } from './hooks/useToast';
+import { ToastProvider } from './hooks/useToast';
+import { useToast } from './hooks/useToastDefinition';
 import { useSocket } from './hooks/useSocket';
 import { getUser } from './utils/tokenUtils';
 
