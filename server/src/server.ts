@@ -9,6 +9,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { createServer } from 'http';
+import cookieParser from 'cookie-parser';
 
 import connectDB from './config/database';
 import limiter from './middleware/rateLimitter';

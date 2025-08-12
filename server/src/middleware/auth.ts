@@ -6,6 +6,7 @@ import { AccessTokenPayload } from '../types/index';
 export interface AuthRequest extends Request {
   user?: {
     userId: string;
+    role: string;
   };
 }
 
@@ -49,7 +50,7 @@ export const authenticateToken = async (
       return;
     }
 
-    req.user = { userId: decoded.userId.toString() };
+    req.user = { userId: decoded.userId.toString(), role: user.role };
     next();
   } catch (error) {
     res.status(403).json({
@@ -57,4 +58,16 @@ export const authenticateToken = async (
       message: 'Invalid or expired token'
     });
   }
+};
+
+export const checkRole = (role: 'user' | 'admin') => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (req.user?.role !== role) {
+      return res.status(403).json({
+        success: false,
+        message: 'Forbidden: Insufficient role'
+      });
+    }
+    next();
+  };
 };

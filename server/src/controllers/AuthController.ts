@@ -21,7 +21,12 @@ export class AuthController {
     try {
       const validatedData = loginSchema.parse(req.body);
       const result = await this.authService.login(validatedData);
-      res.json(result);
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+      res.json({ success: result.success, message: result.message, token: result.token, user: result.user, isAdmin: result.isAdmin });
     } catch (error) {
       next(error);
     }
@@ -50,8 +55,12 @@ export class AuthController {
       }
 
       const result = await this.authService.verifyOTP(validatedData);
-
-      res.json(result);
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+      res.json({ success: result.success, message: result.message, token: result.token, user: result.user, isAdmin: result.isAdmin });
     } catch (error) {
       next(error);
     }
@@ -73,7 +82,12 @@ export class AuthController {
 
       const result = await this.authService.googleAuth({ access_token, id_token });
 
-      res.json(result);
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+      res.json({ success: result.success, message: result.message, token: result.token, user: result.user, isAdmin: result.isAdmin });
 
       // res.cookie('refreshToken', result.refreshToken, {
       //   httpOnly: true,
@@ -90,7 +104,12 @@ export class AuthController {
       const validatedData = githubAuthSchema.parse(req.body);
 
       const result = await this.authService.githubAuth({ code: validatedData.code });
-      res.json(result);
+      res.cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+      });
+      res.json({ success: result.success, message: result.message, token: result.token, user: result.user, isAdmin: result.isAdmin });
     } catch (error) {
       next(error);
     }
@@ -152,5 +171,17 @@ export class AuthController {
     }
   };
 
-
+  refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { refreshToken } = req.cookies;
+      if (!refreshToken) {
+        res.status(401).json({ success: false, message: 'Refresh token not found' });
+        return;
+      }
+      const result = await this.authService.refreshToken(refreshToken);
+      res.json(result);
+    } catch (error) {
+      next(error);
+    }
+  };
 }
