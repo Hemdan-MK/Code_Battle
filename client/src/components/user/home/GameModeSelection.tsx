@@ -6,7 +6,7 @@ import TeamChat from "./TeamChat";
 import TeamSelectionModal from "./TeamSelectionModal";
 import InviteModal from "./InviteModal";
 import { useSocket } from "@/hooks/useSocket";
-import { useToast } from "@/hooks/useToast";
+import { useToast } from "@/hooks/useToastDefinition";
 
 const gameTypes = [
     { id: 'solo', name: 'Solo Queue', description: '1v1 battles' },
