@@ -41,56 +41,27 @@ async function getFriends(userId: string, activeUsers: Map<string, IActiveUser>,
 }
 
 export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Map<string, IActiveUser>) => {
-    
-    socket.on('get_Details', async () => {
+
+    socket.on('client_ready', async () => {
         try {
             const userId = socket.userId;
-
             if (!userId || !isValidObjectId(userId)) {
-                socket.emit('error', {
-                    message: 'Invalid user ID format or userId.'
-                });
+                console.error("client_ready: Invalid user ID for socket", socket.id);
                 return;
             }
 
-            const user = await User.findById(userId).exec();
+            // Avoid re-running setup for the same user if they are already active
+            if (activeUsers.has(userId) && activeUsers.get(userId)?.socketId === socket.id) {
+                // If the same socket is trying to initialize again, maybe just refresh friends
+                 const friendsWithStatus = await getFriends(userId, activeUsers);
+                 socket.emit('friends_list', { friends: friendsWithStatus });
+                return;
+            }
+
+            const user = await User.findById(userId).populate('friends', '_id').exec();
 
             if (!user) {
-                socket.emit('connect_error', {
-                    message: 'User not found. Please log in again.'
-                });
-                return;
-            }
-
-            socket.emit('detail_resp', { user });
-
-        } catch (error) {
-            console.error('Error fetching details:', error);
-            socket.emit('error', {
-                message: 'Failed to load details. Please try again.'
-            });
-        }
-    });
-
-    socket.on('get_friends', async () => {
-        try {
-            const userId = socket.userId;
-
-            if (!userId || !isValidObjectId(userId)) {
-                socket.emit('friends_error', {
-                    message: 'Invalid user ID format. Please log in again.'
-                });
-                return;
-            }
-
-            const user = await User.findById(userId)
-                .populate('friends', '_id username currentAvatar status currentGame rank lastSeen updatedAt')
-                .exec();
-
-            if (!user) {
-                socket.emit('friends_error', {
-                    message: 'User not found. Please log in again.'
-                });
+                socket.emit('friends_error', { message: 'User not found during client_ready.' });
                 return;
             }
 
@@ -130,8 +101,6 @@ export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Ma
 
             // Get friends with updated online status
             const friendsWithStatus = await getFriends(userId, activeUsers);
-
-            // Send friends list to client
             socket.emit('friends_list', { friends: friendsWithStatus });
 
             // Send pending friend requests
@@ -145,23 +114,29 @@ export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Ma
                     senderName: request.username,
                     senderAvatar: request.currentAvatar
                 }));
-
                 socket.emit('pending_friend_requests', { requests: formattedRequests });
             }
 
             console.log(`User ${user.username} (${userId}) connected and friends loaded`);
-        } catch (error: any) {
-            console.error('Error fetching friends:', error);
 
-            if (error.name === 'CastError') {
-                socket.emit('friends_error', {
-                    message: 'Invalid user ID format. Please log in again.'
-                });
-            } else {
-                socket.emit('friends_error', {
-                    message: 'Failed to load friends. Please try again.'
-                });
+        } catch (error) {
+            console.error('Error in client_ready handler:', error);
+            socket.emit('friends_error', { message: 'Failed to initialize client state.' });
+        }
+    });
+
+    socket.on('get_friends', async () => {
+        try {
+            const userId = socket.userId;
+            if (!userId || !isValidObjectId(userId)) {
+                socket.emit('friends_error', { message: 'Invalid user ID format.' });
+                return;
             }
+            const friendsWithStatus = await getFriends(userId, activeUsers);
+            socket.emit('friends_list', { friends: friendsWithStatus });
+        } catch (error) {
+            console.error('Error fetching friends:', error);
+            socket.emit('friends_error', { message: 'Failed to load friends.' });
         }
     });
 
