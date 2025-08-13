@@ -24,7 +24,7 @@ import profileRouter from './routes/user/profileRoutes'
 
 const app = express();
 const server = createServer(app);
-const io = initSocket(server);
+export const io = initSocket(server);
 
 const PORT = process.env.PORT || 3000;
 

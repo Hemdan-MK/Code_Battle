@@ -42,6 +42,36 @@ async function getFriends(userId: string, activeUsers: Map<string, IActiveUser>,
 
 export const setupFriendsHandlers = (socket: Socket, io: Server, activeUsers: Map<string, IActiveUser>) => {
 
+    socket.on('get_Details', async () => {
+        try {
+            const userId = socket.userId;
+
+            if (!userId || !isValidObjectId(userId)) {
+                socket.emit('error', {
+                    message: 'Invalid user ID format or userId.'
+                });
+                return;
+            }
+
+            const user = await User.findById(userId).exec();
+
+            if (!user) {
+                socket.emit('connect_error', {
+                    message: 'User not found. Please log in again.'
+                });
+                return;
+            }
+
+            socket.emit('detail_resp', { user });
+
+        } catch (error) {
+            console.error('Error fetching details:', error);
+            socket.emit('error', {
+                message: 'Failed to load details. Please try again.'
+            });
+        }
+    });
+
     socket.on('client_ready', async () => {
         try {
             const userId = socket.userId;
