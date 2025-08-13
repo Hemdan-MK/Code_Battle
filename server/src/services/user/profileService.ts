@@ -155,15 +155,14 @@ export class ProfileService {
             throw new Error('User not found');
         }
 
-        if (user.hasPassword) {
+        if (user.password) {
             throw new Error('User already has a password. Use the change password functionality.');
         }
 
         const hashedPassword = await bcrypt.hash(newPassword, 12);
 
         await this.userRepository.update(user._id, {
-            password: hashedPassword,
-            hasPassword: true
+            password: hashedPassword
         });
 
         return {
