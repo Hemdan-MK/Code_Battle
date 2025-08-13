@@ -2,7 +2,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import AppRouter from './router/Router';
 import { useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { BrowserRouter, useNavigate } from 'react-router-dom';
 import { clearError } from './redux/authSlice';
 import { type RootState } from './redux/store';
 import { ToastProvider } from './hooks/useToast';
@@ -87,9 +87,11 @@ function AppContent() {
 
 function App() {
   return (
-    <ToastProvider>
-      <AppContent />
-    </ToastProvider>
+    <BrowserRouter>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </BrowserRouter>
   );
 }
 
