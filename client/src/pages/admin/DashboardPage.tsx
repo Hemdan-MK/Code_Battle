@@ -17,6 +17,9 @@ import {
 
 import Dashboard from '@/components/adminSession/dashboard';
 import UserManagement from '@/components/adminSession/userManagement/main';
+import ProblemManagement from '@/components/adminSession/problemManagement/main';
+import RewardManagement from '@/components/adminSession/rewardManagement/main';
+import LevelManagement from '@/components/adminSession/levelManagement/main';
 import { logoutThunk } from '@/redux/thunk';
 import { useAppDispatch } from '@/redux/hooks';
 
@@ -34,7 +37,8 @@ const AdminLayout = () => {
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
     { id: 'users', label: 'User Management', icon: Users },
     { id: 'problems', label: 'Problems', icon: FileText },
-    { id: 'tournaments', label: 'Tournaments', icon: Trophy },
+    { id: 'rewards', label: 'Rewards', icon: Trophy },
+    { id: 'levels', label: 'Levels', icon: Settings }, // Using Settings icon for now
     { id: 'reports', label: 'Reports', icon: AlertTriangle },
     { id: 'forum', label: 'Forum Moderation', icon: MessageSquare },
     { id: 'shop', label: 'Black Market', icon: ShoppingCart },
@@ -52,6 +56,12 @@ const AdminLayout = () => {
         return <Dashboard />;
       case 'users':
         return <UserManagement />;
+      case 'problems':
+        return <ProblemManagement />;
+      case 'rewards':
+        return <RewardManagement />;
+      case 'levels':
+        return <LevelManagement />;
       default:
         return <Dashboard />;
     }

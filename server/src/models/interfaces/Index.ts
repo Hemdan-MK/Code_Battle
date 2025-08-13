@@ -41,3 +41,62 @@ export interface IOTP extends Document {
     createdAt: Date;
     session: "forgot" | "signUp";
 }
+
+export interface ITestCase extends Document {
+    input: string;
+    output: string;
+    isPublic: boolean;
+}
+
+export interface IProblem extends Document {
+    problemId: number;
+    slug: string;
+    title: string;
+    difficulty: 'Easy' | 'Medium' | 'Hard';
+    categories: string[];
+    description: string;
+    constraints?: string | null;
+    testCases: ITestCase[];
+    functionSignature?: string | null;
+    codeTemplates?: Map<string, string> | null;
+    officialSolution?: string | null;
+    createdBy?: Types.ObjectId | null;
+    createdAt: Date;
+    updatedAt: Date;
+    status: 'draft' | 'published' | 'archived';
+}
+
+export interface IIssuedTo extends Document {
+    userId?: Types.ObjectId | null;
+    issuedAt: Date;
+    claimedAt?: Date | null;
+    isClaimed: boolean;
+}
+
+export interface IReward extends Document {
+    rewardId: number;
+    name: string;
+    description?: string | null;
+    rewardType: 'avatar' | 'title';
+    rewardImage?: string | null;
+    avatar?: string | null;
+    title?: string | null;
+    unlockType: 'level_based' | 'rank_based';
+    requiredLevel?: number | null;
+    requiredRank?: number | null;
+    issuedTo?: IIssuedTo[];
+    startDate?: Date | null;
+    endDate?: Date | null;
+    status: 'active' | 'inactive' | 'expired';
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface ILevel extends Document {
+    levelNumber: number;
+    reward: Types.ObjectId;
+    description?: string | null;
+    issuedTo?: IIssuedTo[];
+    createdAt: Date;
+    updatedAt: Date;
+}
