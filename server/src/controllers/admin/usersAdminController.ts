@@ -2,11 +2,9 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { UserAdminService } from '../../services/admin/userAdminService';
-import {
-    GetUsers,
-    CreateUser,
-    UpdateUser,
-} from '../../types/index';
+import { GetUsers, CreateUser, UpdateUser } from '../../types/index';
+import { io } from '../../server';
+import { activeUsers } from '../../socket/store/userStore';
 
 
 export class UsersAdminController {
@@ -30,7 +28,6 @@ export class UsersAdminController {
 
             const result = await this.userService.getUsers(query);
             
-
             const response = {
                 success: true,
                 data: {
@@ -139,11 +136,6 @@ export class UsersAdminController {
     /**
      * Ban user
      */
-import { io } from '../../server';
-import { activeUsers } from '../../socket/store/userStore';
-
-// ... (inside the class)
-
     async banStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id } = req.params;
@@ -174,6 +166,7 @@ import { activeUsers } from '../../socket/store/userStore';
             next(error);
         }
     }
+
     async getUserStats(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const stats = await this.userService.getUserStats();
