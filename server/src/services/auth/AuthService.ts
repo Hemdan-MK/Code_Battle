@@ -237,16 +237,13 @@ export class AuthService implements IAuthService {
                 await this.userRepository.update(user._id, { googleId: userData.googleId });
             } else {
                 // Create new user
-                const randomPassword = Math.random().toString(36).slice(-8);
-                const hashedPassword = await bcrypt.hash(randomPassword, 12);
-
                 user = await this.userRepository.create({
                     email: userData.email,
                     username: userData.email.split('@')[0],
                     phone: 0,   // change in edit
-                    password: hashedPassword,
                     googleId: googleUser.sub,
-                    isEmailVerified: true
+                    isEmailVerified: true,
+                    hasPassword: false // Explicitly set hasPassword to false
                 });
             }
         }
@@ -318,16 +315,14 @@ export class AuthService implements IAuthService {
                 // Link GitHub account
                 await this.userRepository.update(user._id, { githubId: githubUser.id.toString() });
             } else {
-                const randomPassword = Math.random().toString(36).slice(-8); // e.g., "jdh38dfk"
-                const hashedPassword = await bcrypt.hash(randomPassword, 12);
                 // Create new user
                 user = await this.userRepository.create({
                     email: githubUser.email || '',
                     username: githubUser.login,
-                    password: hashedPassword,
                     phone: 0,
                     githubId: githubUser.id.toString(),
-                    isEmailVerified: !!githubUser.email
+                    isEmailVerified: !!githubUser.email,
+                    hasPassword: false // Explicitly set hasPassword to false
                 });
             }
         }

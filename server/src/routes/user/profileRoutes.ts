@@ -13,6 +13,7 @@ const profileController = new ProfileController(profileService)
 router.get('/profile',profileController.details)
 router.post('/updateusername',profileController.updateUsername)
 router.post('/updatepassword',profileController.updatePassword)
+router.post('/add-password', profileController.addPassword)
 
 
 export default router

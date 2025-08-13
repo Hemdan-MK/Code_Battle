@@ -57,4 +57,25 @@ export class ProfileController {
             next(error);
         }
     };
+
+    addPassword = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const authHeader = req.headers['authorization'];
+            if (!authHeader) {
+                return res.status(401).json({ message: 'No token provided' });
+            }
+            const token = authHeader.split(' ')[1];
+
+            // Assuming the new password is in the body, will add validation schema later
+            const { newPassword } = req.body;
+            if (!newPassword) {
+                return res.status(400).json({ message: 'New password is required' });
+            }
+
+            const result = await this.profileService.addPassword({ newPassword, token });
+            return res.json(result);
+        } catch (error) {
+            next(error);
+        }
+    };
 }
