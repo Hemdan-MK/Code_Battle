@@ -14,6 +14,7 @@ router.get('/profile',profileController.details)
 router.post('/updateusername',profileController.updateUsername)
 router.post('/updatepassword',profileController.updatePassword)
 router.post('/add-password', profileController.addPassword)
+router.get('/match-history', profileController.getMatchHistory)
 
 
 export default router

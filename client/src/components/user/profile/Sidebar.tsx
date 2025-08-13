@@ -55,12 +55,14 @@ const Sidebar = ({ setActiveSection, activeSection }) => {
                 </button>
 
                 <button
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-500 cursor-not-allowed text-left"
-                    disabled
+                    onClick={() => setActiveSection('history')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 text-left ${activeSection === 'history'
+                        ? 'bg-purple-600 text-white shadow-lg'
+                        : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+                        }`}
                 >
                     <User size={20} />
                     <span>Match History</span>
-                    <span className="text-xs bg-gray-600 px-2 py-1 rounded ml-auto">Soon</span>
                 </button>
 
                 <button
