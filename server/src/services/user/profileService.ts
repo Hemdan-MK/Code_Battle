@@ -2,6 +2,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { IUserRepository } from '../../repositories/interfaces';
 import { Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import Match from '../../models/Match';
 
 
 
@@ -169,5 +170,20 @@ export class ProfileService {
             success: true,
             message: "Password added successfully"
         };
+    }
+
+    async getMatchHistory(token: string): Promise<any[]> {
+        if (!token) {
+            throw new Error('No token provided');
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload;
+        const userId = new Types.ObjectId(decoded.userId);
+
+        const matches = await Match.find({ "teams.players.userId": userId })
+            .sort({ date: -1 })
+            .limit(20); // Limit to the last 20 matches for performance
+
+        return matches;
     }
 }

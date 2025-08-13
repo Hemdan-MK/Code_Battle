@@ -78,4 +78,19 @@ export class ProfileController {
             next(error);
         }
     };
+
+    getMatchHistory = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+        try {
+            const authHeader = req.headers['authorization'];
+            if (!authHeader) {
+                return res.status(401).json({ message: 'No token provided' });
+            }
+            const token = authHeader.split(' ')[1];
+
+            const result = await this.profileService.getMatchHistory(token);
+            return res.json({ success: true, data: result });
+        } catch (error) {
+            next(error);
+        }
+    };
 }

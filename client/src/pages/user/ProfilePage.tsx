@@ -4,6 +4,7 @@ import RotateDeviceMessage from '@/components/common/RotateDeviceMessage';
 import Sidebar from '@/components/user/profile/Sidebar';
 import SecuritySection from '@/components/user/profile/SecuritySection';
 import RewardsSection from '@/components/user/profile/RewardsSection';
+import MatchHistorySection from '@/components/user/profile/MatchHistorySection';
 
 
 const ProfilePage: React.FC = () => {
@@ -36,6 +37,7 @@ const ProfilePage: React.FC = () => {
                     <div className="p-4 lg:p-8 max-w-6xl mx-auto">
                         {activeSection === 'security' && <SecuritySection />}
                         {activeSection === 'rewards' && <RewardsSection />}
+                        {activeSection === 'history' && <MatchHistorySection />}
                     </div>
                 </div>
             </div>

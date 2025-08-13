@@ -25,6 +25,10 @@ const userSchema = new Schema<IUser>({
         type: Number,
         default: 10
     },
+    elo: {
+        type: Number,
+        default: 1200
+    },
     isBanned: {
         type: Boolean,
         default: false

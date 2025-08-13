@@ -53,6 +53,16 @@ export const updateUsername = async (
     }
 }
 
+export const getMatchHistoryAPI = async (): Promise<any> => {
+    try {
+        const response = await api.get("/user/match-history");
+        return response.data;
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 export const addPasswordAPI = async (newPassword: string): Promise<Response> => {
     try {
         const response = await api.post("/user/add-password", { newPassword });
