@@ -19,7 +19,7 @@ import { initSocket } from './socket';
 // Routes
 import test from './routes/testRoute';
 import authRoutes from './routes/authRoutes';
-import adminRouter from './routes/admin/usersAdminRoutes'
+import adminRouter from './routes/admin'
 import profileRouter from './routes/user/profileRoutes'
 
 const app = express();

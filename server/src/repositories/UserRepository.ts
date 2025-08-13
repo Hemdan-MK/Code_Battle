@@ -86,12 +86,14 @@ export class UserRepository implements IUserRepository {
 
   async getUserStats(): Promise<UserStats> {
     const users = await User.find();
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
 
     const stats: UserStats = {
       total: users.length,
       online: 0,
       offline: 0,
       banned: 0,
+      newSignups: 0,
       ranks: {
         diamond: 0,
         gold: 0,
@@ -108,7 +110,8 @@ export class UserRepository implements IUserRepository {
 
       if (status === 'online') stats.online++;
       if (status === 'offline') stats.offline++;
-      if (status === 'banned') stats.banned++;
+      if (user.isBanned) stats.banned++;
+      if (user.createdAt > sevenDaysAgo) stats.newSignups++;
 
       if (rank in stats.ranks) stats.ranks[rank]++;
     });
