@@ -2,12 +2,14 @@
 import { useSelector, useDispatch } from 'react-redux';
 import AppRouter from './router/Router';
 import { useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { clearError } from './redux/authSlice';
 import { type RootState } from './redux/store';
 import { ToastProvider } from './hooks/useToast';
 import { useToast } from './hooks/useToastDefinition';
 import { useSocket } from './hooks/useSocket';
 import { getUser } from './utils/tokenUtils';
+import { logoutThunk } from './redux/thunk';
 
 // Main App Component
 function AppContent() {
@@ -15,6 +17,7 @@ function AppContent() {
   const dispatch = useDispatch();
   const { showToast } = useToast();
   const { socket } = useSocket();
+  const navigate = useNavigate();
   const user = getUser();
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
 
@@ -59,6 +62,25 @@ function AppContent() {
       dispatch(clearError());
     }
   }, [data, dispatch, showToast]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleBanned = (data: { message: string }) => {
+        showToast(data.message || 'You have been banned by an administrator.', 'error', {
+            title: 'Access Denied',
+            duration: 5000
+        });
+        dispatch(logoutThunk());
+        navigate('/', { replace: true });
+    };
+
+    socket.on('you_are_banned', handleBanned);
+
+    return () => {
+        socket.off('you_are_banned', handleBanned);
+    };
+  }, [socket, dispatch, navigate, showToast]);
 
   return <AppRouter />;
 }

@@ -139,10 +139,29 @@ export class UsersAdminController {
     /**
      * Ban user
      */
+import { io } from '../../server';
+import { activeUsers } from '../../socket/store/userStore';
+
+// ... (inside the class)
+
     async banStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const { id } = req.params;
             const bannedUser = await this.userService.banUser(id);
+
+            // Check if the banned user is currently online
+            const activeUser = activeUsers.get(id);
+            if (activeUser) {
+                const socketId = activeUser.socketId;
+                const socket = io.sockets.sockets.get(socketId);
+                if (socket) {
+                    // Notify the user they have been banned
+                    socket.emit('you_are_banned', { message: 'You have been banned by an administrator.' });
+
+                    // Force disconnect the user
+                    socket.disconnect(true);
+                }
+            }
 
             const response = {
                 success: true,
