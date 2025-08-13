@@ -2,6 +2,7 @@
 import api from "../_axios/axios";
 
 interface ProfileResponse {
+    hasPassword?: boolean;
     username: string;
     tag: string;
     email: string;
