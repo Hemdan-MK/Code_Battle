@@ -242,8 +242,7 @@ export class AuthService implements IAuthService {
                     username: userData.email.split('@')[0],
                     phone: 0,   // change in edit
                     googleId: googleUser.sub,
-                    isEmailVerified: true,
-                    hasPassword: false // Explicitly set hasPassword to false
+                    isEmailVerified: true
                 });
             }
         }
@@ -321,8 +320,7 @@ export class AuthService implements IAuthService {
                     username: githubUser.login,
                     phone: 0,
                     githubId: githubUser.id.toString(),
-                    isEmailVerified: !!githubUser.email,
-                    hasPassword: false // Explicitly set hasPassword to false
+                    isEmailVerified: !!githubUser.email
                 });
             }
         }

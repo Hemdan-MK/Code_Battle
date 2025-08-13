@@ -18,6 +18,7 @@ export interface IUser extends Document {
     rank: 'unranked' | 'iron' | 'bronze' | 'silver' | 'gold' | 'diamond',
     xp: number,
     level?: number;
+    elo: number;
     isBanned: boolean;
     currentAvatar?: Types.ObjectId | null;
     currentTitle?: string;

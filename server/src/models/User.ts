@@ -10,7 +10,6 @@ const userSchema = new Schema<IUser>({
     phone: { type: Number, required: true, },
     password: { type: String, required: false }, // Changed to not required
     role: { type: String, default: "user" },
-    hasPassword: { type: Boolean, default: true },
     googleId: { type: String, default: null },
     githubId: { type: String, default: null },
     isEmailVerified: { type: Boolean, default: false, },
