@@ -110,7 +110,6 @@ export interface UserStats {
     online: number;
     offline: number;
     banned: number;
-    newSignups: number;
     ranks: {
         unranked: number;
         iron: number;
