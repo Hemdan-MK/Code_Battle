@@ -13,6 +13,7 @@ export interface UserProfileResponse {
     rank: 'unranked' | 'iron' | 'bronze' | 'silver' | 'gold' | 'diamond';
     level?: number;
     xp: number;
+    hasPassword?: boolean;
     currentAvatar?: Types.ObjectId | null;
     currentTitle?: string;
     collections?: {
@@ -57,6 +58,7 @@ export class ProfileService {
             rank: user.rank,
             level: user.level,
             xp: user.xp,
+            hasPassword: !!user.password, // Check if password field exists and is not empty
             currentAvatar: user.currentAvatar,
             currentTitle: user.currentTitle,
             collections: user.collections,
@@ -132,6 +134,40 @@ export class ProfileService {
         return {
             success: true,
             message: "password updation success"
+        };
+    }
+
+    async addPassword(data: {
+        newPassword: string;
+        token: string;
+    }): Promise<Response> {
+        const { newPassword, token } = data;
+
+        if (!token) {
+            throw new Error('No token provided');
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as JwtPayload;
+        const user = await this.userRepository.findById(decoded.userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        if (user.hasPassword) {
+            throw new Error('User already has a password. Use the change password functionality.');
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+        await this.userRepository.update(user._id, {
+            password: hashedPassword,
+            hasPassword: true
+        });
+
+        return {
+            success: true,
+            message: "Password added successfully"
         };
     }
 }
