@@ -34,13 +34,7 @@ export interface UserStats {
     online: number;
     offline: number;
     banned: number;
-    newSignups: number;
     ranks: Record<UserRank, number>;
-}
-
-export interface DashboardStats {
-    userStats: UserStats;
-    // TODO: Add other stats
 }
 
 export interface GetUsersQuery {
@@ -99,66 +93,4 @@ export interface PaginationOptions {
     limit: number;
     sortBy?: keyof User;
     sortOrder?: 'asc' | 'desc';
-}
-
-export interface ITestCase {
-    input: string;
-    output: string;
-    isPublic: boolean;
-}
-
-export interface IProblem {
-    _id?: string;
-    problemId: number;
-    slug: string;
-    title: string;
-    difficulty: 'Easy' | 'Medium' | 'Hard';
-    categories: string[];
-    description: string;
-    constraints?: string | null;
-    testCases: ITestCase[];
-    functionSignature?: string | null;
-    codeTemplates?: Map<string, string> | null;
-    officialSolution?: string | null;
-    createdBy?: string | null; // Assuming createdBy is a user ID string
-    createdAt: Date;
-    updatedAt: Date;
-    status: 'draft' | 'published' | 'archived';
-}
-
-export interface IIssuedTo {
-    userId?: string | null;
-    issuedAt: Date;
-    claimedAt?: Date | null;
-    isClaimed: boolean;
-}
-
-export interface IReward {
-    _id?: string;
-    rewardId: number;
-    name: string;
-    description?: string | null;
-    rewardType: 'avatar' | 'title';
-    rewardImage?: string | null;
-    avatar?: string | null;
-    title?: string | null;
-    unlockType: 'level_based' | 'rank_based';
-    requiredLevel?: number | null;
-    requiredRank?: number | null;
-    issuedTo?: IIssuedTo[];
-    startDate?: Date | null;
-    endDate?: Date | null;
-    status: 'active' | 'inactive' | 'expired';
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface ILevel {
-    _id?: string;
-    levelNumber: number;
-    reward: string; // Reward ID
-    description?: string | null;
-    issuedTo?: IIssuedTo[];
-    createdAt: Date;
-    updatedAt: Date;
 }

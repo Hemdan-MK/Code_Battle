@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
     Users,
     FileText,
@@ -6,54 +5,26 @@ import {
     BarChart3,
     AlertTriangle
 } from 'lucide-react';
-import dashboardService from '@/services/admin/dashboardService';
-import type { DashboardStats } from '@/types/index';
+
 
 const Dashboard = () => {
-    const [stats, setStats] = useState<DashboardStats | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const data = await dashboardService.getDashboardStats();
-                setStats(data);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to fetch stats');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchStats();
-    }, []);
-
-    const statCards = stats ? [
-        { label: 'Total Users', value: stats.userStats.total.toLocaleString(), change: `+${stats.userStats.newSignups} this week`, icon: Users, color: 'from-blue-500 to-cyan-500' },
+    const stats = [
+        { label: 'Total Users', value: '12,543', change: '+12%', icon: Users, color: 'from-blue-500 to-cyan-500' },
         { label: 'Active Matches', value: '89', change: '+5%', icon: Shield, color: 'from-green-500 to-emerald-500' },
         { label: 'Revenue', value: '$45,230', change: '+18%', icon: BarChart3, color: 'from-purple-500 to-violet-500' },
         { label: 'Problems', value: '234', change: '+3%', icon: FileText, color: 'from-orange-500 to-red-500' },
-    ] : [];
+    ];
 
     const mockReports = [
         { id: 1, reporter: 'user123', reported: 'cheater456', reason: 'Code plagiarism', status: 'pending', date: '2024-06-03' },
         { id: 2, reporter: 'cleancode', reported: 'spammer789', reason: 'Inappropriate behavior', status: 'resolved', date: '2024-06-02' },
     ];
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div className="text-red-500">{error}</div>;
-    }
-
     return (
         <div className="space-y-6">
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {statCards.map((stat, index) => {
+                {stats.map((stat, index) => {
                     const Icon = stat.icon;
                     return (
                         <div key={index} className="bg-gray-800 p-6 rounded-xl shadow-lg border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 group">
