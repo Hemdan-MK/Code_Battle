@@ -140,14 +140,6 @@ export const testConnection = async (): Promise<boolean> => {
 
 export const loginAPI = async (data: LoginRequest): Promise<AuthResponse> => {
     try {
-        // Test connection first
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            throw new Error(
-                "Cannot connect to server. Please ensure the server is running on http://localhost:3000"
-            );
-        }
-
         const response = await api.post<AuthResponse>("/auth/login", data);
         console.log("Login response status:", response);
 
@@ -162,14 +154,6 @@ export const signupAPI = async (
     data: SignupRequest
 ): Promise<SignupResponse> => {
     try {
-        // Test connection first
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            throw new Error(
-                "Cannot connect to server. Please ensure the server is running on http://localhost:3000"
-            );
-        }
-
         const response = await api.post("/auth/signup", data);
         console.log("Signup response :", response.data);
 
@@ -225,15 +209,6 @@ export const googleAuthAPI = async (
     data: GoogleAuthRequest
 ): Promise<GoogleAuthResponse> => {
     try {
-        // Test connection first
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            throw new Error(
-                "Cannot connect to server. Please ensure the server is running on http://localhost:3000"
-            );
-        }
-
-
         const response = await api.post<GoogleAuthResponse>("/auth/google", data);
         console.log("Google Auth response status:", response.status);
 
@@ -248,14 +223,6 @@ export const githubAuthAPI = async (
     data: GitHubAuthRequest
 ): Promise<GitHubAuthResponse> => {
     try {
-        // Test connection first
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            throw new Error(
-                "Cannot connect to server. Please ensure the server is running on http://localhost:3000"
-            );
-        }
-
         const response = await api.post<GitHubAuthResponse>("/auth/github", data);
         console.log("GitHub Auth response status:", response.status);
 
@@ -273,14 +240,6 @@ export const forgotPasswordAPI = async (
     data: ForgotPasswordRequest
 ): Promise<ForgotPasswordResponse> => {
     try {
-        // Test connection first
-        const isConnected = await testConnection();
-        if (!isConnected) {
-            throw new Error(
-                "Cannot connect to server. Please ensure the server is running on http://localhost:3000"
-            );
-        }
-
         const response = await api.post<ForgotPasswordResponse>(
             "/auth/forgot-password",
             data
